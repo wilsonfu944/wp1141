@@ -1,0 +1,35 @@
+{
+  "name": "running-tracker",
+  "version": "1.0.0",
+  "description": "純前端跑步紀錄追蹤網頁 - 傅仲瑜的個人跑步紀錄系統",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx live-server --port=3000 --open=/index.html",
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "keywords": [
+    "running",
+    "tracker",
+    "fitness",
+    "chart",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "傅仲瑜",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2",
+    "typescript": "^5.0.0",
+    "@types/chart.js": "^2.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/running-tracker.git"
+  },
+  "homepage": "https://your-username.github.io/running-tracker"
+}
+
