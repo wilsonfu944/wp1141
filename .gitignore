@@ -49,8 +49,6 @@ temp/
 Icon?
 
 # 排除開發相關檔案
-hw1/script.ts
-hw1/tsconfig.json
 hw1/package.json
 hw1/compile.sh
 hw1/音樂/
