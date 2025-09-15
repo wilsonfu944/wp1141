@@ -39,6 +39,8 @@ const ONLINE_MUSIC_CONFIG = {
     // ... 其他歌曲
 };
 
-
-
-
+// 將配置暴露到全域範圍
+if (typeof window !== 'undefined') {
+    window.MUSIC_CONFIG = MUSIC_CONFIG;
+    window.ONLINE_MUSIC_CONFIG = ONLINE_MUSIC_CONFIG;
+}
