@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Homepage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header / Navbar -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>My Homepage</h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#home" class="nav-link">首頁</a></li>
+                    <li><a href="#about" class="nav-link">關於我</a></li>
+                    <li><a href="#interests" class="nav-link">興趣專題</a></li>
+                    <li><a href="#travel" class="nav-link">旅行相簿</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="home-section">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h2>Hi, I'm 陳劭瑋, welcome to my homepage!</h2>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">關於我</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>就讀於台大資管系，喜歡動漫和音樂。</p>
+                    <p>在課餘時間，也常常下西洋棋、練習自學鋼琴。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interests Section -->
+    <section id="interests" class="interests-section">
+        <div class="container">
+            <h2 class="section-title">My Favorite Music</h2>
+            <div class="music-cards">
+                <div class="music-card" data-song="song1">
+                    <div class="card-image">
+                        <img src="https://via.placeholder.com/200x200/8E44AD/FFFFFF?text=Album+1" alt="Album Cover">
+                        <button class="play-btn" data-song="song1">▶</button>
+                    </div>
+                    <div class="card-content">
+                        <h3>花之塔</h3>
+                        <p>Sayuri</p>
+                    </div>
+                </div>
+
+                <div class="music-card" data-song="song2">
+                    <div class="card-image">
+                        <img src="https://via.placeholder.com/200x200/E74C3C/FFFFFF?text=Album+2" alt="Album Cover">
+                        <button class="play-btn" data-song="song2">▶</button>
+                    </div>
+                    <div class="card-content">
+                        <h3>星座になれたら</h3>
+                        <p>內藤英雅</p>
+                    </div>
+                </div>
+
+                <div class="music-card" data-song="song3">
+                    <div class="card-image">
+                        <img src="https://via.placeholder.com/200x200/27AE60/FFFFFF?text=Album+3" alt="Album Cover">
+                        <button class="play-btn" data-song="song3">▶</button>
+                    </div>
+                    <div class="card-content">
+                        <h3>声なき魚</h3>
+                        <p>大西省吾</p>
+                    </div>
+                </div>
+
+                <div class="music-card" data-song="song4">
+                    <div class="card-image">
+                        <img src="https://via.placeholder.com/200x200/F39C12/FFFFFF?text=Album+4" alt="Album Cover">
+                        <button class="play-btn" data-song="song4">▶</button>
+                    </div>
+                    <div class="card-content">
+                        <h3>愛ゆえの決断</h3>
+                        <p>松田彬人</p>
+                    </div>
+                </div>
+
+                <div class="music-card" data-song="song5">
+                    <div class="card-image">
+                        <img src="https://via.placeholder.com/200x200/9B59B6/FFFFFF?text=Album+5" alt="Album Cover">
+                        <button class="play-btn" data-song="song5">▶</button>
+                    </div>
+                    <div class="card-content">
+                        <h3>三日月之舞</h3>
+                        <p>松田彬人</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Travel Gallery Section -->
+    <section id="travel" class="travel-section">
+        <div class="container">
+            <h2 class="section-title">My Travel Gallery</h2>
+            <p class="section-description">Here are some memories from my trips, categorized by destination.</p>
+            
+            <!-- Travel Categories -->
+            <div class="travel-categories">
+                <div class="travel-category" data-category="osaka">
+                    <div class="category-image">
+                        <img src="photos/osaka/osaka1.jpg" alt="Osaka" onerror="this.src='https://via.placeholder.com/300x200/8B9DC3/FFFFFF?text=Osaka'">
+                    </div>
+                    <div class="category-content">
+                        <h3>Osaka</h3>
+                        <p>Exploring the vibrant streets and delicious street food</p>
+                        <button class="view-album-btn" data-category="osaka">View Album</button>
+                    </div>
+                </div>
+
+                <div class="travel-category" data-category="kyoto">
+                    <div class="category-image">
+                        <img src="photos/kyoto/kyoto1.jpg" alt="Kyoto" onerror="this.src='https://via.placeholder.com/300x200/A8C8A8/FFFFFF?text=Kyoto'">
+                    </div>
+                    <div class="category-content">
+                        <h3>Kyoto</h3>
+                        <p>Traditional temples and beautiful gardens</p>
+                        <button class="view-album-btn" data-category="kyoto">View Album</button>
+                    </div>
+                </div>
+
+                <div class="travel-category" data-category="tokyo">
+                    <div class="category-image">
+                        <img src="photos/tokyo/tokyo1.jpg" alt="Tokyo" onerror="this.src='https://via.placeholder.com/300x200/D4A574/FFFFFF?text=Tokyo'">
+                    </div>
+                    <div class="category-content">
+                        <h3>Tokyo</h3>
+                        <p>Modern city life and cultural experiences</p>
+                        <button class="view-album-btn" data-category="tokyo">View Album</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo Albums (Hidden by default) -->
+            <div class="photo-albums">
+                <!-- Osaka Album -->
+                <div class="photo-album" id="osaka-album" style="display: none;">
+                    <div class="album-header">
+                        <h3>Osaka Memories</h3>
+                        <button class="close-album-btn" data-category="osaka">Close Album</button>
+                    </div>
+                    <div class="photo-grid">
+                        <div class="photo-item">
+                            <img src="photos/osaka/osaka1.jpg" alt="Osaka Photo 1" onerror="this.src='https://via.placeholder.com/250x200/8B9DC3/FFFFFF?text=Osaka+1'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/osaka/osaka2.jpg" alt="Osaka Photo 2" onerror="this.src='https://via.placeholder.com/250x200/8B9DC3/FFFFFF?text=Osaka+2'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/osaka/osaka3.jpg" alt="Osaka Photo 3" onerror="this.src='https://via.placeholder.com/250x200/8B9DC3/FFFFFF?text=Osaka+3'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/osaka/osaka4.jpg" alt="Osaka Photo 4" onerror="this.src='https://via.placeholder.com/250x200/8B9DC3/FFFFFF?text=Osaka+4'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/osaka/osaka5.jpg" alt="Osaka Photo 5" onerror="this.src='https://via.placeholder.com/250x200/8B9DC3/FFFFFF?text=Osaka+5'">
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Kyoto Album -->
+                <div class="photo-album" id="kyoto-album" style="display: none;">
+                    <div class="album-header">
+                        <h3>Kyoto Memories</h3>
+                        <button class="close-album-btn" data-category="kyoto">Close Album</button>
+                    </div>
+                    <div class="photo-grid">
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto1.jpg" alt="Kyoto Photo 1" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+1'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto2.jpg" alt="Kyoto Photo 2" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+2'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto3.jpg" alt="Kyoto Photo 3" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+3'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto4.jpg" alt="Kyoto Photo 4" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+4'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto5.jpg" alt="Kyoto Photo 5" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+5'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto6.jpg" alt="Kyoto Photo 6" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+6'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/kyoto/kyoto7.jpg" alt="Kyoto Photo 7" onerror="this.src='https://via.placeholder.com/250x200/A8C8A8/FFFFFF?text=Kyoto+7'">
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Tokyo Album -->
+                <div class="photo-album" id="tokyo-album" style="display: none;">
+                    <div class="album-header">
+                        <h3>Tokyo Memories</h3>
+                        <button class="close-album-btn" data-category="tokyo">Close Album</button>
+                    </div>
+                    <div class="photo-grid">
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo1.jpg" alt="Tokyo Photo 1" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+1'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo2.jpg" alt="Tokyo Photo 2" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+2'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo3.jpg" alt="Tokyo Photo 3" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+3'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo4.jpg" alt="Tokyo Photo 4" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+4'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo5.jpg" alt="Tokyo Photo 5" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+5'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo6.jpg" alt="Tokyo Photo 6" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+6'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo7.jpg" alt="Tokyo Photo 7" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+7'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo8.jpg" alt="Tokyo Photo 8" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+8'">
+                        </div>
+                        <div class="photo-item">
+                            <img src="photos/tokyo/tokyo9.jpg" alt="Tokyo Photo 9" onerror="this.src='https://via.placeholder.com/250x200/D4A574/FFFFFF?text=Tokyo+9'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 My Homepage. Last updated: <span id="last-updated"></span></p>
+            <p>距離寒假還有 <span id="winter-break-countdown"></span> 天</p>
+        </div>
+    </footer>
+
+    <!-- Audio elements for music playback -->
+    <audio id="audio-player" preload="none">
+        <source src="placeholder.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Music configuration -->
+    <script src="music-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
