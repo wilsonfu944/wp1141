@@ -1,0 +1,22 @@
+{
+  "name": "running-tracker",
+  "version": "1.0.0",
+  "description": "個人跑步紀錄追蹤網頁",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "npx http-server dist -p 3000",
+    "start": "npm run build && npm run serve"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "http-server": "^14.0.0"
+  },
+  "keywords": ["running", "tracker", "typescript"],
+  "author": "傅仲瑜",
+  "license": "MIT"
+}
+
+
