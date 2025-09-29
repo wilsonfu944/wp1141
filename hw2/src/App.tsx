@@ -7,6 +7,14 @@ interface Position {
   y: number;
 }
 
+// 定義移動障礙物介面
+interface MovingObstacle {
+  x: number;
+  y: number;
+  dx: number; // x 方向移動速度
+  dy: number; // y 方向移動速度
+}
+
 // 定義方向介面
 interface Direction {
   x: number;
@@ -25,18 +33,191 @@ const App: React.FC = () => {
   
   // 遊戲狀態
   const [snake, setSnake] = useState<Position[]>([
-    { x: 10, y: 10 }, // 蛇頭
-    { x: 9, y: 10 },  // 蛇身
-    { x: 8, y: 10 }   // 蛇尾
+    { x: 2, y: 2 }, // 蛇頭 - 使用安全位置
+    { x: 1, y: 2 }, // 蛇身
+    { x: 0, y: 2 }  // 蛇尾
   ]);
   const [foods, setFoods] = useState<Position[]>([]);
   const [direction, setDirection] = useState<Direction>({ x: 1, y: 0 });
   const [gameRunning, setGameRunning] = useState(true);
   const [bestScore, setBestScore] = useState(0);
   const [foodEaten, setFoodEaten] = useState(false);
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
+  const [showLevelClear, setShowLevelClear] = useState(false);
+  const [showYouWin, setShowYouWin] = useState(false);
+  const [movingObstacles, setMovingObstacles] = useState<MovingObstacle[]>([]);
 
-  // 生成隨機食物位置
-  const generateFood = useCallback((existingFoods: Position[] = [], snakeBody: Position[] = []): Position => {
+  // 關卡地圖設計
+  const getLevelObstacles = useCallback((currentLevel: number): Position[] => {
+    switch (currentLevel) {
+      case 1:
+        // Level 1: 空白場地（無障礙物）
+        return [];
+      
+      case 2:
+        // Level 2: 簡化迷宮場地（移除一半障礙物）
+        const obstacles: Position[] = [];
+        
+        // 只保留上邊界和下邊界（移除左右邊界）
+        for (let x = 2; x < GRID_WIDTH - 2; x++) {
+          // 上邊界：在 x=10 留出口
+          if (x !== 10) {
+            obstacles.push({ x, y: 2 });
+          }
+          // 下邊界：在 x=10 留出口
+          if (x !== 10) {
+            obstacles.push({ x, y: GRID_HEIGHT - 3 });
+          }
+        }
+        
+        // 移除左右邊界，讓蛇可以自由進出
+        
+        return obstacles;
+      
+      case 3:
+        // Level 3: 回字型迷宮場地
+        const mazeObstacles: Position[] = [];
+        
+        // 上下邊界內側（留出口）
+        for (let x = 2; x < GRID_WIDTH - 2; x++) {
+          // 上邊界：在 x=10 留出口
+          if (x !== 10) {
+            mazeObstacles.push({ x, y: 2 });
+          }
+          // 下邊界：在 x=10 留出口
+          if (x !== 10) {
+            mazeObstacles.push({ x, y: GRID_HEIGHT - 3 });
+          }
+        }
+        
+        // 左右邊界內側（留出口）
+        for (let y = 2; y < GRID_HEIGHT - 2; y++) {
+          // 左邊界：在 y=10 留出口
+          if (y !== 10) {
+            mazeObstacles.push({ x: 2, y });
+          }
+          // 右邊界：在 y=10 留出口
+          if (y !== 10) {
+            mazeObstacles.push({ x: GRID_WIDTH - 3, y });
+          }
+        }
+        
+        // 移除中間長方形牆，讓蛇可以在中央自由移動
+        
+        return mazeObstacles;
+      
+      default:
+        return [];
+    }
+  }, []);
+
+  // 獲取安全的蛇初始位置
+  const getSafeSnakePosition = useCallback((currentLevel: number): Position[] => {
+    const obstacles = getLevelObstacles(currentLevel);
+    
+    // Level 2: 蛇生成在最中間
+    if (currentLevel === 2) {
+      const centerPosition = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+      const isSafe = centerPosition.every(pos => 
+        !obstacles.some(obstacle => obstacle.x === pos.x && obstacle.y === pos.y)
+      );
+      
+      // 檢查蛇頭前方是否安全（向右移動）
+      const head = centerPosition[0];
+      const frontSafe = !obstacles.some(obstacle => obstacle.x === head.x + 1 && obstacle.y === head.y);
+      
+      // 檢查是否在邊界內
+      const inBounds = centerPosition.every(pos => 
+        pos.x >= 0 && pos.x < GRID_WIDTH && pos.y >= 0 && pos.y < GRID_HEIGHT
+      );
+      
+      // 檢查蛇頭前方是否在邊界內
+      const frontInBounds = head.x + 1 >= 0 && head.x + 1 < GRID_WIDTH && head.y >= 0 && head.y < GRID_HEIGHT;
+      
+      if (isSafe && frontSafe && inBounds && frontInBounds) {
+        return centerPosition;
+      }
+    }
+    
+    // Level 3: 蛇生成在迷宮的正中間
+    if (currentLevel === 3) {
+      const centerPosition = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+      const isSafe = centerPosition.every(pos => 
+        !obstacles.some(obstacle => obstacle.x === pos.x && obstacle.y === pos.y)
+      );
+      
+      // 檢查蛇頭前方是否安全（向右移動）
+      const head = centerPosition[0];
+      const frontSafe = !obstacles.some(obstacle => obstacle.x === head.x + 1 && obstacle.y === head.y);
+      
+      // 檢查是否在邊界內
+      const inBounds = centerPosition.every(pos => 
+        pos.x >= 0 && pos.x < GRID_WIDTH && pos.y >= 0 && pos.y < GRID_HEIGHT
+      );
+      
+      // 檢查蛇頭前方是否在邊界內
+      const frontInBounds = head.x + 1 >= 0 && head.x + 1 < GRID_WIDTH && head.y >= 0 && head.y < GRID_HEIGHT;
+      
+      if (isSafe && frontSafe && inBounds && frontInBounds) {
+        return centerPosition;
+      }
+    }
+    
+    // 其他關卡：嘗試不同的位置，找到沒有障礙物的位置
+    const possiblePositions = [
+      // 左上角區域 - 向右移動
+      [{ x: 2, y: 2 }, { x: 1, y: 2 }, { x: 0, y: 2 }],
+      [{ x: 2, y: 3 }, { x: 1, y: 3 }, { x: 0, y: 3 }],
+      // 右上角區域 - 向左移動
+      [{ x: 17, y: 2 }, { x: 18, y: 2 }, { x: 19, y: 2 }],
+      [{ x: 17, y: 3 }, { x: 18, y: 3 }, { x: 19, y: 3 }],
+      // 左下角區域 - 向右移動
+      [{ x: 2, y: 17 }, { x: 1, y: 17 }, { x: 0, y: 17 }],
+      [{ x: 2, y: 16 }, { x: 1, y: 16 }, { x: 0, y: 16 }],
+      // 右下角區域 - 向左移動
+      [{ x: 17, y: 17 }, { x: 18, y: 17 }, { x: 19, y: 17 }],
+      [{ x: 17, y: 16 }, { x: 18, y: 16 }, { x: 19, y: 16 }],
+    ];
+    
+    // 找到第一個沒有障礙物且前方也安全的位置
+    for (const position of possiblePositions) {
+      const head = position[0];
+      const isSafe = position.every(pos => 
+        !obstacles.some(obstacle => obstacle.x === pos.x && obstacle.y === pos.y)
+      );
+      
+      // 檢查蛇頭前方是否安全（根據位置決定方向）
+      let frontSafe = true;
+      if (head.x <= 2) {
+        // 左側位置，檢查右前方
+        frontSafe = !obstacles.some(obstacle => obstacle.x === head.x + 1 && obstacle.y === head.y);
+      } else if (head.x >= 17) {
+        // 右側位置，檢查左前方
+        frontSafe = !obstacles.some(obstacle => obstacle.x === head.x - 1 && obstacle.y === head.y);
+      }
+      
+      if (isSafe && frontSafe) {
+        return position;
+      }
+    }
+    
+    // 如果都找不到安全位置，返回預設位置
+    return [
+      { x: 2, y: 2 },
+      { x: 1, y: 2 },
+      { x: 0, y: 2 }
+    ];
+  }, [getLevelObstacles]);
+
+  // Level 3 現在是迷宮場地，不需要移動障礙物
+
+  // Level 3 現在是迷宮場地，不需要移動障礙物
+
+  // Level 3 現在是迷宮場地，不需要移動障礙物碰撞檢測
+
+  // 生成隨機食物位置（考慮移動障礙物）
+  const generateFood = useCallback((existingFoods: Position[] = [], snakeBody: Position[] = [], obstacles: Position[] = [], movingObstaclesList: MovingObstacle[] = []): Position => {
     let newFood: Position;
     do {
       newFood = {
@@ -45,30 +226,31 @@ const App: React.FC = () => {
       };
     } while (
       snakeBody.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
-      existingFoods.some(food => food.x === newFood.x && food.y === newFood.y)
+      existingFoods.some(food => food.x === newFood.x && food.y === newFood.y) ||
+      obstacles.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y) ||
+      movingObstaclesList.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y)
     );
     
     return newFood;
   }, []);
 
-  // 初始化食物
+  // 初始化食物（考慮移動障礙物）
   const initializeFoods = useCallback(() => {
-    const foodCount = Math.floor(Math.random() * 3) + 1; // 1-3 個食物
+    const foodCount = 3; // 固定3個食物
     const newFoods: Position[] = [];
     
-    // 使用初始蛇身位置來避免衝突
-    const initialSnake = [
-      { x: 10, y: 10 }, // 蛇頭
-      { x: 9, y: 10 },  // 蛇身
-      { x: 8, y: 10 }   // 蛇尾
-    ];
+    // 使用安全的蛇身位置和當前關卡障礙物來避免衝突
+    const safeSnakePosition = getSafeSnakePosition(level);
+    const obstacles = getLevelObstacles(level);
     
+    // Level 3 時，食物生成不考慮移動障礙物，因為移動障礙物會移動
+    // 食物生成後保持固定位置
     for (let i = 0; i < foodCount; i++) {
-      newFoods.push(generateFood(newFoods, initialSnake));
+      newFoods.push(generateFood(newFoods, safeSnakePosition, obstacles, []));
     }
     
     setFoods(newFoods);
-  }, [generateFood]);
+  }, [generateFood, getLevelObstacles, getSafeSnakePosition, level]);
 
   // 繪製遊戲畫面
   const drawGame = useCallback(() => {
@@ -136,6 +318,27 @@ const App: React.FC = () => {
       ctx.shadowColor = 'transparent';
     });
 
+    // 繪製障礙物
+    const obstacles = getLevelObstacles(level);
+    obstacles.forEach(obstacle => {
+      const obstacleX = obstacle.x * GRID_SIZE;
+      const obstacleY = obstacle.y * GRID_SIZE;
+      
+      // 黑色方塊
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(obstacleX + 1, obstacleY + 1, GRID_SIZE - 2, GRID_SIZE - 2);
+      
+      // 障礙物陰影
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fillRect(obstacleX + 1, obstacleY + 1, GRID_SIZE - 2, GRID_SIZE - 2);
+      ctx.shadowColor = 'transparent';
+    });
+
+    // Level 3 現在是迷宮場地，不需要繪製移動障礙物
+
     // 繪製所有食物
     foods.forEach(food => {
       const foodX = food.x * GRID_SIZE;
@@ -165,7 +368,7 @@ const App: React.FC = () => {
       ctx.fill();
       ctx.shadowColor = 'transparent';
     });
-  }, [snake, foods]);
+  }, [snake, foods, getLevelObstacles, level]);
 
   // 移動蛇
   const moveSnake = useCallback(() => {
@@ -188,6 +391,15 @@ const App: React.FC = () => {
         return prevSnake;
       }
       
+      // 檢查是否撞到障礙物
+      const obstacles = getLevelObstacles(level);
+      if (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
+        setGameRunning(false);
+        return prevSnake;
+      }
+      
+      // Level 3 現在是迷宮場地，不需要移動障礙物碰撞檢測
+      
       // 檢查是否吃到食物
       const eatenFoodIndex = foods.findIndex(food => food.x === head.x && food.y === head.y);
       
@@ -198,13 +410,61 @@ const App: React.FC = () => {
         // 移除被吃掉的食物
         const newFoods = foods.filter((_, index) => index !== eatenFoodIndex);
         
-        // 如果食物數量少於 3，則新增一個新食物
-        if (newFoods.length < 3) {
-          const newFood = generateFood(newFoods, prevSnake);
-          newFoods.push(newFood);
-        }
+        // 更新分數
+        const newScore = score + 1;
+        setScore(newScore);
         
-        setFoods(newFoods);
+        // 檢查是否過關（吃到 5 個食物）
+        if (newScore >= 5) {
+          if (level >= 3) {
+            // 遊戲勝利
+            setShowYouWin(true);
+            setGameRunning(false);
+          } else {
+            // 過關
+            setShowLevelClear(true);
+            setGameRunning(false);
+            
+            // 2秒後進入下一關
+            setTimeout(() => {
+              const nextLevel = level + 1;
+              setLevel(nextLevel);
+              setScore(0);
+              setShowLevelClear(false);
+              setGameRunning(true);
+              
+              // 重置蛇的位置（根據關卡選擇安全位置）
+              const safeSnakePosition = getSafeSnakePosition(nextLevel);
+              setSnake(safeSnakePosition);
+              
+              // Level 3 現在是迷宮場地，不需要移動障礙物
+              
+              // 重新生成食物（使用新關卡，不考慮移動障礙物）
+              const foodCount = 3;
+              const newFoods: Position[] = [];
+              const obstacles = getLevelObstacles(nextLevel);
+              
+              // Level 3 時，食物生成不考慮移動障礙物，因為移動障礙物會移動
+              // 食物生成後保持固定位置
+              for (let i = 0; i < foodCount; i++) {
+                newFoods.push(generateFood(newFoods, safeSnakePosition, obstacles, []));
+              }
+              
+              setFoods(newFoods);
+            }, 2000);
+          }
+        } else {
+          // 確保場上一直維持3個食物（不考慮移動障礙物）
+          while (newFoods.length < 3) {
+            const obstacles = getLevelObstacles(level);
+            // Level 3 時，食物生成不考慮移動障礙物，因為移動障礙物會移動
+            // 食物生成後保持固定位置
+            const newFood = generateFood(newFoods, prevSnake, obstacles, []);
+            newFoods.push(newFood);
+          }
+          
+          setFoods(newFoods);
+        }
         
         // 更新最高分
         const currentScore = newSnake.length - 3;
@@ -223,7 +483,7 @@ const App: React.FC = () => {
         return newSnake;
       }
     });
-  }, [direction, foods, generateFood, bestScore]);
+  }, [direction, foods, generateFood, bestScore, score, level, getLevelObstacles, initializeFoods]);
 
   // 遊戲迴圈 - 使用定時器控制移動速度
   useEffect(() => {
@@ -237,6 +497,8 @@ const App: React.FC = () => {
       clearInterval(gameTimer);
     };
   }, [gameRunning, moveSnake]);
+
+  // Level 3 現在是迷宮場地，不需要移動障礙物定時器
 
   // 繪製遊戲畫面
   useEffect(() => {
@@ -298,11 +560,13 @@ const App: React.FC = () => {
 
   // 重新開始遊戲
   const restartGame = () => {
-    setSnake([
-      { x: 10, y: 10 },
-      { x: 9, y: 10 },
-      { x: 8, y: 10 }
-    ]);
+    const safeSnakePosition = getSafeSnakePosition(1); // Level 1 的安全位置
+    setSnake(safeSnakePosition);
+    setLevel(1);
+    setScore(0);
+    setShowLevelClear(false);
+    setShowYouWin(false);
+    // Level 3 現在是迷宮場地，不需要移動障礙物
     initializeFoods();
     setDirection({ x: 1, y: 0 });
     setGameRunning(true);
@@ -321,7 +585,8 @@ const App: React.FC = () => {
         <div className="game-container">
           {/* 分數卡片 */}
           <div className="score-card">
-            <p>SCORE: {snake.length - 3}</p>
+            <p>LEVEL: {level}</p>
+            <p>SCORE: {score}/5</p>
             <p>BEST: {bestScore}</p>
           </div>
           
@@ -331,13 +596,37 @@ const App: React.FC = () => {
             height={400}
             className="game-canvas"
           />
-          {!gameRunning && (
+          {!gameRunning && !showLevelClear && !showYouWin && (
             <div className="game-over-overlay">
               <div className="game-over-content">
                 <h2>Game Over</h2>
-                <p>SCORE: {snake.length - 3}</p>
+                <p>LEVEL: {level}</p>
+                <p>SCORE: {score}/5</p>
                 <button onClick={restartGame} className="restart-button">
                   RESTART
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {showLevelClear && (
+            <div className="game-over-overlay">
+              <div className="game-over-content">
+                <h2>Level Clear!</h2>
+                <p>LEVEL {level} COMPLETED</p>
+                <p>Moving to Level {level + 1}...</p>
+              </div>
+            </div>
+          )}
+          
+          {showYouWin && (
+            <div className="game-over-overlay">
+              <div className="game-over-content">
+                <h2>You Win!</h2>
+                <p>CONGRATULATIONS!</p>
+                <p>All levels completed!</p>
+                <button onClick={restartGame} className="restart-button">
+                  PLAY AGAIN
                 </button>
               </div>
             </div>
