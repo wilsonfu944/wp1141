@@ -1,0 +1,94 @@
+.modal {
+  top: 20px;
+}
+
+.compareContainer {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.compareTable :global(.ant-table) {
+  font-size: 14px;
+}
+
+.attributeColumn {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.imageContainer {
+  position: relative;
+  text-align: center;
+  padding: 12px;
+}
+
+.compareImage {
+  width: 100%;
+  max-width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.removeBtn {
+  margin-top: 8px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.description {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+/* 滾動條樣式 */
+.compareContainer::-webkit-scrollbar,
+.description::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.compareContainer::-webkit-scrollbar-track,
+.description::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.compareContainer::-webkit-scrollbar-thumb,
+.description::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.compareContainer::-webkit-scrollbar-thumb:hover,
+.description::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 響應式 */
+@media (max-width: 768px) {
+  .compareImage {
+    max-width: 100px;
+    height: 100px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+}
+
+
