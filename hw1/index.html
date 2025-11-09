@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>傅仲瑜的跑步紀錄</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 自我介紹區 -->
+        <section class="intro-section">
+            <div class="profile">
+                <img src="大頭照.png" alt="傅仲瑜" class="profile-image">
+                <h1 class="name">傅仲瑜</h1>
+                <div class="intro-text">
+                    <p>嗨，我是傅仲瑜，我超愛跑步🏃‍♂️！所以在我的個人網頁上會實時更新每天的跑步資訊，自己可以看到進步，也喜歡跟朋友分享，互相打氣。</p>
+                    <p>除了跑步，我喜歡聽音樂🎵，也常常思考人生，懷疑一些現有的觀念。雖然對未來還有點迷茫，但我對探索新事物充滿好奇心。透過記錄跑步數據，我希望能培養更好的自律和規劃能力，也能一直挑戰自己。</p>
+                    <p>我加入了向日葵服務社🌻，喜歡透過服務和合作學習、成長。除此之外，我對學新知識、挑戰新技能都很有興趣，希望一步步找到自己的方向，靠近理想中的自己。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 學經歷區 -->
+        <section class="education-section">
+            <h2>學經歷</h2>
+            <div class="education-timeline">
+                <div class="education-item">
+                    <div class="education-year">2010-2016</div>
+                    <div class="education-school">再興國小</div>
+                    <div class="education-description">國小基礎教育階段</div>
+                </div>
+                <div class="education-item">
+                    <div class="education-year">2016-2019</div>
+                    <div class="education-school">延平國中</div>
+                    <div class="education-description">國中教育階段</div>
+                </div>
+                <div class="education-item">
+                    <div class="education-year">2019-2022</div>
+                    <div class="education-school">建國中學</div>
+                    <div class="education-description">高中教育階段</div>
+                </div>
+                <div class="education-item">
+                    <div class="education-year">2022-至今</div>
+                    <div class="education-school">台大電機</div>
+                    <div class="education-description">大學電機工程學系</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 跑步賽事區 -->
+        <section class="races-section">
+            <h2>跑步賽事經歷</h2>
+            <div class="race-form-container">
+                <form id="raceForm" class="race-form">
+                    <div class="form-group">
+                        <label for="raceName">賽事名稱：</label>
+                        <input type="text" id="raceName" name="raceName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="raceDate">比賽日期：</label>
+                        <input type="date" id="raceDate" name="raceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="raceDistance">距離（公里）：</label>
+                        <input type="number" id="raceDistance" name="raceDistance" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="raceTime">完賽時間：</label>
+                        <input type="text" id="raceTime" name="raceTime" placeholder="例：1:30:25" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="raceRank">排名：</label>
+                        <input type="text" id="raceRank" name="raceRank" placeholder="例：第15名 / 總排名 150/500">
+                    </div>
+                    <div class="form-group">
+                        <label for="raceMood">心情：</label>
+                        <select id="raceMood" name="raceMood" required>
+                            <option value="">請選擇心情</option>
+                            <option value="非常開心">😄 非常開心</option>
+                            <option value="開心">😊 開心</option>
+                            <option value="普通">😐 普通</option>
+                            <option value="不開心">😔 不開心</option>
+                            <option value="非常不開心">😢 非常不開心</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="add-btn">新增賽事</button>
+                </form>
+            </div>
+            <div class="races-list">
+                <h3>我的賽事紀錄</h3>
+                <div id="racesContainer" class="races-container">
+                    <!-- 賽事紀錄會動態生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 排行榜 -->
+        <section class="leaderboard-section">
+            <h2>跑步排行榜</h2>
+            <div class="sort-controls">
+                <button id="sortByDistance" class="sort-btn">依距離排序</button>
+                <button id="sortByPace" class="sort-btn">依配速排序</button>
+                <button id="sortByDate" class="sort-btn">依日期排序</button>
+            </div>
+            <div class="table-container">
+                <table id="leaderboardTable" class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>日期</th>
+                            <th>距離（公里）</th>
+                            <th>時間（分鐘）</th>
+                            <th>平均配速（分鐘/公里）</th>
+                            <th>心情</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 跑步紀錄表單 -->
+        <section class="form-section">
+            <h2>新增跑步紀錄</h2>
+            <form id="runningForm" class="running-form">
+                <div class="form-group">
+                    <label for="date">日期：</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="distance">距離（公里）：</label>
+                    <input type="number" id="distance" name="distance" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">時間（分鐘）：</label>
+                    <input type="number" id="time" name="time" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="mood">心情：</label>
+                    <select id="mood" name="mood" required>
+                        <option value="">請選擇心情</option>
+                        <option value="非常開心">😄 非常開心</option>
+                        <option value="開心">😊 開心</option>
+                        <option value="普通">😐 普通</option>
+                        <option value="不開心">😔 不開心</option>
+                        <option value="非常不開心">😢 非常不開心</option>
+                    </select>
+                </div>
+                <button type="submit" class="add-btn">新增紀錄</button>
+            </form>
+        </section>
+
+        <!-- 圖表區 -->
+        <section class="charts-section">
+            <h2>跑步數據圖表</h2>
+            <div class="chart-container">
+                <canvas id="distanceChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="paceChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 月曆區 -->
+        <section class="calendar-section">
+            <h2>跑步月曆</h2>
+            <div class="calendar-controls">
+                <button id="prevMonth" class="month-btn">上一月</button>
+                <span id="currentMonth" class="current-month"></span>
+                <button id="nextMonth" class="month-btn">下一月</button>
+            </div>
+            <div id="calendar" class="calendar"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
