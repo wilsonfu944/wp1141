@@ -5,6 +5,8 @@ NTU Web Programming 114-1 GitHub repo template
 # MySocialMedia
 
 一個使用 Next.js + NextAuth + MongoDB + Pusher 建立的社群網站，類似 Twitter/X。
+已經deploy到vercel
+網址：https://wp1141-liard.vercel.app/
 
 ## 功能特色
 
