@@ -127,3 +127,5 @@ npm run dev
 - 瀏覽器開發者工具中的 Console 和 Network 標籤
 - Next.js 終端機中的錯誤訊息
 
+
+

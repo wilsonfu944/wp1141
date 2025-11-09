@@ -35,3 +35,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# 不上傳 node_modules
+node_modules/
+
+# 不上傳本地端環境變數
+.env
+.env.local
+
+# 不上傳 build 結果
+.next/
+
+# 不上傳 macOS 自動產生的系統檔
+.DS_Store
