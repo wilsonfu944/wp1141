@@ -6,9 +6,7 @@ A Twitter/X-like social media platform built with Next.js, featuring real-time i
 
 ## 🚀 Deployed Link
 
-**Live Demo**: [https://your-app.vercel.app](https://your-app.vercel.app)
-
-> **注意**: 部署後請將上方連結替換為實際的 Vercel 網址
+**Live Demo**: [https://hw5-ecru.vercel.app](https://hw5-ecru.vercel.app)
 
 ---
 
