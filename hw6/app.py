@@ -218,6 +218,7 @@ def handle_follow(event):
                 # 發送人格選擇按鈕（使用 push_message，確保格式正確）
                 try:
                     from services.persona_service import PersonaService
+                    from linebot.exceptions import LineBotApiError
                     import time
                     time.sleep(0.5)
                     
@@ -225,11 +226,22 @@ def handle_follow(event):
                     buttons1 = PersonaService.create_persona_selection_buttons()
                     buttons2 = PersonaService.create_persona_selection_buttons_part2()
                     
+                    print(f"🔍 Attempting to send buttons to {user_id} (FollowEvent)")
+                    print(f"   Button 1 type: {type(buttons1)}")
+                    
                     # 使用 push_message 發送（確保是正確的 TemplateSendMessage 物件）
                     line_bot_api.push_message(user_id, buttons1)
+                    print(f"✅ First button sent successfully (FollowEvent)")
                     time.sleep(0.3)
                     line_bot_api.push_message(user_id, buttons2)
+                    print(f"✅ Second button sent successfully (FollowEvent)")
                     print(f"✅ Persona selection buttons sent to {user_id}")
+                except LineBotApiError as btn_error:
+                    print(f"❌ LINE API Error sending buttons: {btn_error}")
+                    print(f"   Error code: {btn_error.status_code}")
+                    print(f"   Error message: {btn_error.message}")
+                    import traceback
+                    traceback.print_exc()
                 except Exception as btn_error:
                     print(f"❌ Failed to send persona buttons: {btn_error}")
                     import traceback

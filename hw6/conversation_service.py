@@ -75,11 +75,26 @@ class ConversationService:
 
 現在，先選擇你喜歡的人格吧～💕"""
                 
-                # 先回覆用戶的第一條訊息（使用 reply_token）
+                # 先回覆用戶的第一條訊息（使用 reply_token，這樣可以同時發送按鈕）
                 if reply_token:
                     try:
                         self.line_service.reply_text_message(reply_token, welcome_message)
                         print(f"✅ Sent welcome message via reply_token to {user_id}")
+                        
+                        # 使用 reply_message 發送按鈕（更可靠）
+                        try:
+                            import time
+                            time.sleep(0.5)
+                            buttons1 = PersonaService.create_persona_selection_buttons()
+                            buttons2 = PersonaService.create_persona_selection_buttons_part2()
+                            
+                            # 使用 push_message 發送按鈕（reply_token 只能用一次）
+                            self.line_bot_api.push_message(user_id, buttons1)
+                            time.sleep(0.3)
+                            self.line_bot_api.push_message(user_id, buttons2)
+                            print(f"✅ Buttons sent via push_message after reply")
+                        except Exception as btn_e:
+                            print(f"⚠️ Failed to send buttons after reply: {btn_e}")
                     except Exception as e:
                         print(f"⚠️ Failed to send welcome via reply_token: {e}")
                         # 如果 reply 失敗，嘗試 push message
@@ -101,24 +116,37 @@ class ConversationService:
                 conversation.add_message(welcome_msg)
                 self.conversation_repo.save(conversation)
                 
-                # 發送人格選擇按鈕（確保格式正確）
-                try:
-                    import time
-                    time.sleep(0.5)
-                    
-                    # 建立按鈕訊息
-                    buttons1 = PersonaService.create_persona_selection_buttons()
-                    buttons2 = PersonaService.create_persona_selection_buttons_part2()
-                    
-                    # 使用 push_message 發送
-                    self.line_bot_api.push_message(user_id, buttons1)
-                    time.sleep(0.3)
-                    self.line_bot_api.push_message(user_id, buttons2)
-                    print(f"✅ Persona selection buttons sent to {user_id}")
-                except Exception as e:
-                    print(f"❌ Failed to send persona buttons: {e}")
-                    import traceback
-                    traceback.print_exc()
+                # 發送人格選擇按鈕（如果還沒用 reply_token 發送過）
+                # 注意：如果已經在 reply_token 部分發送過，這裡就不需要再發送
+                if not reply_token:  # 只有在沒有 reply_token 時才在這裡發送
+                    try:
+                        import time
+                        time.sleep(0.5)
+                        
+                        # 建立按鈕訊息
+                        buttons1 = PersonaService.create_persona_selection_buttons()
+                        buttons2 = PersonaService.create_persona_selection_buttons_part2()
+                        
+                        # 使用 push_message 發送（需要使用者先加好友）
+                        print(f"🔍 Attempting to send buttons to {user_id} (no reply_token)")
+                        print(f"   Button 1 type: {type(buttons1)}")
+                        
+                        self.line_bot_api.push_message(user_id, buttons1)
+                        print(f"✅ First button sent successfully")
+                        time.sleep(0.3)
+                        self.line_bot_api.push_message(user_id, buttons2)
+                        print(f"✅ Second button sent successfully")
+                        print(f"✅ Persona selection buttons sent to {user_id}")
+                    except LineBotApiError as e:
+                        print(f"❌ LINE API Error sending buttons: {e}")
+                        print(f"   Error code: {e.status_code}")
+                        print(f"   Error message: {e.message}")
+                        import traceback
+                        traceback.print_exc()
+                    except Exception as e:
+                        print(f"❌ Failed to send persona buttons: {e}")
+                        import traceback
+                        traceback.print_exc()
                 
                 # 稍等一下讓歡迎訊息先顯示，然後再處理用戶訊息
                 import time
