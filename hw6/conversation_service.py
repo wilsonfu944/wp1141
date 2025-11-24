@@ -162,16 +162,43 @@ class ConversationService:
                     # 重新顯示人格選擇按鈕
                     try:
                         buttons1 = PersonaService.create_persona_selection_buttons()
-                        if reply_token:
-                            self.line_bot_api.reply_message(reply_token, buttons1)
-                        else:
-                            self.line_bot_api.push_message(user_id, buttons1)
-                        import time
-                        time.sleep(0.3)
                         buttons2 = PersonaService.create_persona_selection_buttons_part2()
-                        self.line_bot_api.push_message(user_id, buttons2)
-                        print(f"✅ Persona selection buttons sent to {user_id} (via user request)")
-                        response_text = "請選擇你喜歡的人格～💕"
+                        
+                        # 驗證按鈕格式
+                        from linebot.models import TemplateSendMessage
+                        if not isinstance(buttons1, TemplateSendMessage):
+                            print(f"❌ buttons1 不是 TemplateSendMessage: {type(buttons1)}")
+                            response_text = "抱歉，按鈕格式錯誤～💔"
+                        else:
+                            print(f"✅ Buttons format verified: {type(buttons1)}")
+                            
+                            # 如果有 reply_token，使用 reply_message（更可靠）
+                            if reply_token:
+                                # reply_token 只能用一次，所以發送第一個按鈕
+                                self.line_bot_api.reply_message(reply_token, buttons1)
+                                print(f"✅ First button sent via reply_message")
+                                # 第二個按鈕用 push_message
+                                import time
+                                time.sleep(0.3)
+                                self.line_bot_api.push_message(user_id, buttons2)
+                                print(f"✅ Second button sent via push_message")
+                            else:
+                                # 沒有 reply_token，都用 push_message
+                                self.line_bot_api.push_message(user_id, buttons1)
+                                import time
+                                time.sleep(0.3)
+                                self.line_bot_api.push_message(user_id, buttons2)
+                                print(f"✅ Both buttons sent via push_message")
+                            
+                            print(f"✅ Persona selection buttons sent to {user_id} (via user request)")
+                            response_text = "請選擇你喜歡的人格～💕"
+                    except LineBotApiError as e:
+                        print(f"❌ LINE API Error sending buttons: {e}")
+                        print(f"   Error code: {e.status_code}")
+                        print(f"   Error message: {e.message}")
+                        import traceback
+                        traceback.print_exc()
+                        response_text = f"抱歉，按鈕發送失敗了～💔 錯誤碼: {e.status_code}"
                     except Exception as e:
                         print(f"❌ Failed to send persona buttons: {e}")
                         import traceback
