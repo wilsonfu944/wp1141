@@ -1,0 +1,18 @@
+#!/bin/bash
+# 快速設定 .env 檔案的腳本範例
+# 請複製此檔案為 setup_env.sh 並填入你的真實 API 金鑰
+
+cat > .env << EOF
+LINE_CHANNEL_ID=your_channel_id_here
+LINE_CHANNEL_SECRET=your_channel_secret_here
+LINE_CHANNEL_ACCESS_TOKEN=your_channel_access_token_here
+LLM_API_KEY=your_llm_api_key_here
+LLM_API_BASE=https://api.groq.com/openai/v1
+MONGODB_URI=your_mongodb_uri_here
+EOF
+
+echo "✅ .env 檔案已建立！"
+echo "⚠️  請確認已填入所有真實的 API 金鑰！"
+
+
+
