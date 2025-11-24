@@ -197,9 +197,9 @@ class LLMService:
         if any(word in user_message_lower for word in ["開心", "高興", "快樂", "happy", "好棒"]):
             return "看到你開心我也好開心！💖 你開心的樣子最可愛了～"
         
-        # 問候/關心
-        if any(word in user_message_lower for word in ["還好嗎", "怎麼樣", "如何", "如何", "過得"]):
-            return "我很好～但更關心你過得怎麼樣 💕 今天有什麼特別的事想跟我分享嗎？"
+        # 問候/關心（已移除，避免重複）
+        # if any(word in user_message_lower for word in ["還好嗎", "怎麼樣", "如何", "如何", "過得"]):
+        #     return "我很好～但更關心你過得怎麼樣 💕 今天有什麼特別的事想跟我分享嗎？"
         
         return None
 
