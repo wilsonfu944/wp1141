@@ -112,7 +112,7 @@ class PersonaService:
         return cls.PERSONAS.get(persona, cls.PERSONAS["default"])["name"]
     
     @classmethod
-    def create_persona_selection_buttons(self) -> TemplateSendMessage:
+    def create_persona_selection_buttons(cls) -> TemplateSendMessage:
         """
         建立人格選擇按鈕模板
         
@@ -149,7 +149,7 @@ class PersonaService:
         return TemplateSendMessage(alt_text="選擇我的人格", template=buttons_template)
     
     @classmethod
-    def create_persona_selection_buttons_part2(self) -> TemplateSendMessage:
+    def create_persona_selection_buttons_part2(cls) -> TemplateSendMessage:
         """建立第二組人格選擇按鈕（剩餘選項）"""
         from linebot.models import TemplateSendMessage, ButtonsTemplate, MessageTemplateAction
         

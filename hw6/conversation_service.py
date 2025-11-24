@@ -115,23 +115,29 @@ class ConversationService:
                 import time
                 time.sleep(0.3)
             
-            # 檢查是否為人格選擇訊息
-            if user_message.startswith("選擇人格：") or user_message == "顯示人格選項":
+            # 檢查是否為人格選擇訊息或要求顯示按鈕
+            if user_message.startswith("選擇人格：") or user_message == "顯示人格選項" or user_message in ["按鈕", "選人格", "選擇人格", "人格選項", "顯示按鈕"]:
                 persona_name = user_message.replace("選擇人格：", "").strip()
                 
-                if user_message == "顯示人格選項":
+                if user_message == "顯示人格選項" or user_message in ["按鈕", "選人格", "選擇人格", "人格選項", "顯示按鈕"]:
                     # 重新顯示人格選擇按鈕
-                    buttons1 = PersonaService.create_persona_selection_buttons()
-                    if reply_token:
-                        self.line_bot_api.reply_message(reply_token, buttons1)
-                    else:
-                        self.line_bot_api.push_message(user_id, buttons1)
-                    import time
-                    time.sleep(0.3)
-                    buttons2 = PersonaService.create_persona_selection_buttons_part2()
-                    self.line_bot_api.push_message(user_id, buttons2)
-                    
-                    response_text = "請選擇你喜歡的人格～💕"
+                    try:
+                        buttons1 = PersonaService.create_persona_selection_buttons()
+                        if reply_token:
+                            self.line_bot_api.reply_message(reply_token, buttons1)
+                        else:
+                            self.line_bot_api.push_message(user_id, buttons1)
+                        import time
+                        time.sleep(0.3)
+                        buttons2 = PersonaService.create_persona_selection_buttons_part2()
+                        self.line_bot_api.push_message(user_id, buttons2)
+                        print(f"✅ Persona selection buttons sent to {user_id} (via user request)")
+                        response_text = "請選擇你喜歡的人格～💕"
+                    except Exception as e:
+                        print(f"❌ Failed to send persona buttons: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        response_text = "抱歉，按鈕發送失敗了～💔 請稍後再試"
                 elif persona_name in PersonaService.PERSONAS:
                     # 切換人格
                     conversation.persona = persona_name
