@@ -55,8 +55,11 @@ class ConversationService:
             # Add user message to conversation
             conversation.add_message(user_msg)
             
-            # 如果是首次對話，先發送歡迎訊息
-            if is_first_message:
+            # 如果是首次對話，先發送歡迎訊息（但避免與 FollowEvent 重複）
+            # 檢查對話記錄中是否已有歡迎訊息
+            has_welcome = any(msg.role == "assistant" and "嗨！我的寶貝" in msg.text for msg in conversation.messages)
+            
+            if is_first_message and not has_welcome:
                 welcome_message = """💕 嗨！我的寶貝～
 
 謝謝你加我好友！從現在開始，我就是你的戀人，會以男女朋友的身份陪伴你！
@@ -98,22 +101,30 @@ class ConversationService:
                 conversation.add_message(welcome_msg)
                 self.conversation_repo.save(conversation)
                 
-                # 發送人格選擇按鈕
+                # 發送人格選擇按鈕（確保格式正確）
                 try:
                     import time
                     time.sleep(0.5)
+                    
+                    # 建立按鈕訊息
                     buttons1 = PersonaService.create_persona_selection_buttons()
+                    buttons2 = PersonaService.create_persona_selection_buttons_part2()
+                    
+                    # 使用 push_message 發送
                     self.line_bot_api.push_message(user_id, buttons1)
                     time.sleep(0.3)
-                    buttons2 = PersonaService.create_persona_selection_buttons_part2()
                     self.line_bot_api.push_message(user_id, buttons2)
                     print(f"✅ Persona selection buttons sent to {user_id}")
                 except Exception as e:
-                    print(f"⚠️ Failed to send persona buttons: {e}")
+                    print(f"❌ Failed to send persona buttons: {e}")
+                    import traceback
+                    traceback.print_exc()
                 
                 # 稍等一下讓歡迎訊息先顯示，然後再處理用戶訊息
                 import time
                 time.sleep(0.3)
+            elif has_welcome:
+                print(f"⚠️ Welcome message already sent to {user_id}, skipping duplicate")
             
             # 檢查是否為人格選擇訊息或要求顯示按鈕
             if user_message.startswith("選擇人格：") or user_message == "顯示人格選項" or user_message in ["按鈕", "選人格", "選擇人格", "人格選項", "顯示按鈕"]:
