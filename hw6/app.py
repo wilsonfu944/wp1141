@@ -201,29 +201,45 @@ def handle_follow(event):
             except:
                 pass
         
-        # 將歡迎訊息存入資料庫
+        # 將歡迎訊息存入資料庫並發送按鈕
         try:
             conversation = get_conversation_service().conversation_repo.find_or_create(user_id, "line")
-            welcome_msg = Message(
-                text=welcome_message,
-                role="assistant"
-            )
-            conversation.add_message(welcome_msg)
-            get_conversation_service().conversation_repo.save(conversation)
-            print(f"✅ Welcome message saved to database for {user_id}")
             
-            # 發送人格選擇按鈕
-            from services.persona_service import PersonaService
-            import time
-            time.sleep(0.5)
-            buttons1 = PersonaService.create_persona_selection_buttons()
-            line_bot_api.push_message(user_id, buttons1)
-            time.sleep(0.3)
-            buttons2 = PersonaService.create_persona_selection_buttons_part2()
-            line_bot_api.push_message(user_id, buttons2)
-            print(f"✅ Persona selection buttons sent to {user_id}")
+            # 檢查是否已經發送過歡迎訊息（避免重複）
+            if len(conversation.messages) == 0:
+                welcome_msg = Message(
+                    text=welcome_message,
+                    role="assistant"
+                )
+                conversation.add_message(welcome_msg)
+                get_conversation_service().conversation_repo.save(conversation)
+                print(f"✅ Welcome message saved to database for {user_id}")
+                
+                # 發送人格選擇按鈕（使用 push_message，確保格式正確）
+                try:
+                    from services.persona_service import PersonaService
+                    import time
+                    time.sleep(0.5)
+                    
+                    # 建立按鈕訊息
+                    buttons1 = PersonaService.create_persona_selection_buttons()
+                    buttons2 = PersonaService.create_persona_selection_buttons_part2()
+                    
+                    # 使用 push_message 發送（確保是正確的 TemplateSendMessage 物件）
+                    line_bot_api.push_message(user_id, buttons1)
+                    time.sleep(0.3)
+                    line_bot_api.push_message(user_id, buttons2)
+                    print(f"✅ Persona selection buttons sent to {user_id}")
+                except Exception as btn_error:
+                    print(f"❌ Failed to send persona buttons: {btn_error}")
+                    import traceback
+                    traceback.print_exc()
+            else:
+                print(f"⚠️ Welcome message already sent to {user_id}, skipping")
         except Exception as e:
             print(f"⚠️ Failed to save welcome message: {e}")
+            import traceback
+            traceback.print_exc()
         
     except Exception as e:
         print(f"❌ Error handling follow event: {str(e)}")
