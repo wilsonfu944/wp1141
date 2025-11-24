@@ -181,25 +181,17 @@ def handle_follow(event):
 
 現在，有什麼想跟我說的嗎？💕"""
         
-        # 使用 push message 發送歡迎訊息
+        # 使用 push message 發送歡迎訊息（FollowEvent 沒有 reply_token，只能用 push）
         try:
             line_bot_api.push_message(
                 user_id,
                 TextMessage(text=welcome_message)
             )
-            print(f"✅ Welcome message sent to {user_id}")
+            print(f"✅ Welcome message sent to {user_id} (FollowEvent)")
         except Exception as e:
             print(f"❌ Failed to send push message: {e}")
-            # 如果 push message 失敗，嘗試使用 reply（但 Follow Event 通常沒有 reply_token）
-            try:
-                if hasattr(event, 'reply_token') and event.reply_token:
-                    line_bot_api.reply_message(
-                        event.reply_token,
-                        TextMessage(text=welcome_message)
-                    )
-                    print(f"✅ Welcome message sent via reply to {user_id}")
-            except:
-                pass
+            import traceback
+            traceback.print_exc()
         
         # 將歡迎訊息存入資料庫並發送按鈕
         try:
@@ -216,11 +208,13 @@ def handle_follow(event):
                 print(f"✅ Welcome message saved to database for {user_id}")
                 
                 # 發送人格選擇按鈕（使用 push_message，確保格式正確）
+                # 在 FollowEvent 中，使用 push_message 是唯一選擇（沒有 reply_token）
+                # 即使 Auto-reply 或 Greeting 開啟，push_message 也能發送
                 try:
                     from services.persona_service import PersonaService
                     from linebot.exceptions import LineBotApiError
                     import time
-                    time.sleep(0.5)
+                    time.sleep(0.5)  # 稍等一下確保歡迎訊息先顯示
                     
                     # 建立按鈕訊息
                     buttons1 = PersonaService.create_persona_selection_buttons()
@@ -229,13 +223,13 @@ def handle_follow(event):
                     print(f"🔍 Attempting to send buttons to {user_id} (FollowEvent)")
                     print(f"   Button 1 type: {type(buttons1)}")
                     
-                    # 使用 push_message 發送（確保是正確的 TemplateSendMessage 物件）
+                    # 使用 push_message 發送（即使 Auto-reply/Greeting 開啟也能發送）
                     line_bot_api.push_message(user_id, buttons1)
                     print(f"✅ First button sent successfully (FollowEvent)")
                     time.sleep(0.3)
                     line_bot_api.push_message(user_id, buttons2)
                     print(f"✅ Second button sent successfully (FollowEvent)")
-                    print(f"✅ Persona selection buttons sent to {user_id}")
+                    print(f"✅ Persona selection buttons sent to {user_id} (FollowEvent)")
                 except LineBotApiError as btn_error:
                     print(f"❌ LINE API Error sending buttons: {btn_error}")
                     print(f"   Error code: {btn_error.status_code}")
