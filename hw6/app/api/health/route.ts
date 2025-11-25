@@ -12,7 +12,7 @@ export async function GET() {
       services: {
         database: 'connected',
         line: process.env.LINE_CHANNEL_SECRET ? 'configured' : 'missing',
-        gemini: process.env.GEMINI_API_KEY ? 'configured' : 'missing',
+        groq: process.env.GROQ_API_KEY ? 'configured' : 'missing',
       },
     });
   } catch (error) {

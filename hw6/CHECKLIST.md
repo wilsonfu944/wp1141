@@ -73,7 +73,7 @@
 - [x] **MongoDB Atlas + Mongoose**：已整合
 - [x] **部署至 Vercel**：已準備好部署設定
 - [x] **Line Messaging API**：已串接
-- [x] **LLM 串接**：Google Gemini API
+- [x] **LLM 串接**：Groq API
 - [x] **環境變數**：使用 `.env.local`，已在 `.gitignore` 中排除
 
 ### 建議

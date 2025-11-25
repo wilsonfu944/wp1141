@@ -1,13 +1,13 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { LLMError } from '../errors';
 import { log } from '../logger';
 
-const getGeminiClient = () => {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not set in environment variables');
+const getGroqClient = () => {
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  if (!GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY is not set in environment variables');
   }
-  return new GoogleGenerativeAI(GEMINI_API_KEY);
+  return new Groq({ apiKey: GROQ_API_KEY });
 };
 
 interface Message {
@@ -20,46 +20,47 @@ export async function generateResponse(
   systemPrompt?: string
 ): Promise<string> {
   try {
-    const genAI = getGeminiClient();
+    const groq = getGroqClient();
     
-    // Try gemini-1.5-flash first (faster and more available), fallback to gemini-pro
-    let model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Prepare messages for Groq API
+    const groqMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
     
-    // Convert messages to Gemini format
-    const prompt = buildPrompt(messages, systemPrompt);
-
-    try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-
-      if (!text || text.trim().length === 0) {
-        throw new LLMError('Empty response from Gemini');
-      }
-
-      return text.trim();
-    } catch (modelError: unknown) {
-      // If 404 (model not found), try gemini-pro as fallback
-      if (
-        (modelError && typeof modelError === 'object' && 'status' in modelError && modelError.status === 404) ||
-        (modelError instanceof Error && (modelError.message.includes('404') || modelError.message.includes('Not Found')))
-      ) {
-        log.warn('gemini-1.5-flash not available, trying gemini-pro', { error: modelError });
-        model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        if (!text || text.trim().length === 0) {
-          throw new LLMError('Empty response from Gemini');
-        }
-
-        return text.trim();
-      }
-      throw modelError;
+    // Add system prompt if provided
+    if (systemPrompt) {
+      groqMessages.push({
+        role: 'system',
+        content: systemPrompt,
+      });
     }
+    
+    // Convert conversation history to Groq format
+    for (const msg of messages) {
+      if (msg.role === 'system') {
+        continue; // System messages are handled above
+      }
+      groqMessages.push({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      });
+    }
+
+    // Use llama-3.1-70b-versatile or mixtral-8x7b-32768
+    const completion = await groq.chat.completions.create({
+      messages: groqMessages,
+      model: 'llama-3.1-70b-versatile',
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    const text = completion.choices[0]?.message?.content;
+
+    if (!text || text.trim().length === 0) {
+      throw new LLMError('Empty response from Groq');
+    }
+
+    return text.trim();
   } catch (error: unknown) {
-    log.error('Gemini API error', { error });
+    log.error('Groq API error', { error });
 
     // Handle specific error types
     if (error && typeof error === 'object') {
@@ -93,25 +94,3 @@ export async function generateResponse(
     throw new LLMError('無法生成回應，請稍後再試', error);
   }
 }
-
-function buildPrompt(messages: Message[], systemPrompt?: string): string {
-  let prompt = '';
-
-  if (systemPrompt) {
-    prompt += `${systemPrompt}\n\n`;
-  }
-
-  // Convert conversation history
-  for (const msg of messages) {
-    if (msg.role === 'system') {
-      continue; // System messages are handled above
-    }
-    const role = msg.role === 'user' ? '玩家' : '莊家';
-    prompt += `${role}: ${msg.content}\n`;
-  }
-
-  prompt += '莊家: ';
-
-  return prompt;
-}
-

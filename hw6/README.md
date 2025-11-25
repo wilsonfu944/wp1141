@@ -1,6 +1,6 @@
 # 海龜湯 LINE Bot
 
-一個整合 Google Gemini AI 的海龜湯推理遊戲 LINE Bot，使用 Next.js 開發並部署至 Vercel。![alt text](https://qr-official.line.me/sid/L/089zdkfo.png)
+一個整合 Groq AI 的海龜湯推理遊戲 LINE Bot，使用 Next.js 開發並部署至 Vercel。![alt text](https://qr-official.line.me/sid/L/089zdkfo.png)
 
 # LINE Bot QR Code
 
@@ -11,7 +11,7 @@ Production URL：sea-turtle-soup-bot.vercel.app
 ## 功能特色
 
 - 🎮 **海龜湯遊戲**：AI 莊家提供謎題，玩家通過提問找出真相
-- 🤖 **AI 驅動**：使用 Google Gemini API 提供智能回應
+- 🤖 **AI 驅動**：使用 Groq API 提供智能回應
 - 💬 **對話管理**：完整的對話紀錄與狀態追蹤
 - 📊 **管理後台**：即時監控對話、檢視統計、管理歷程
 - 🔄 **優雅降級**：LLM 服務失效時提供友善的降級回覆
@@ -21,7 +21,7 @@ Production URL：sea-turtle-soup-bot.vercel.app
 
 - **框架**：Next.js 14 (App Router) + TypeScript
 - **資料庫**：MongoDB Atlas + Mongoose
-- **AI 服務**：Google Gemini API
+- **AI 服務**：Groq API
 - **部署**：Vercel
 - **樣式**：Tailwind CSS
 
@@ -34,8 +34,8 @@ Production URL：sea-turtle-soup-bot.vercel.app
 LINE_CHANNEL_SECRET=
 LINE_CHANNEL_ACCESS_TOKEN=
 
-# Google Gemini API
-GEMINI_API_KEY=
+# Groq API
+GROQ_API_KEY=
 
 # MongoDB
 MONGODB_URI=
@@ -101,7 +101,7 @@ npm run dev
 在 Vercel 專案設定中的 "Environment Variables" 添加：
 - `LINE_CHANNEL_SECRET`
 - `LINE_CHANNEL_ACCESS_TOKEN`
-- `GEMINI_API_KEY`
+- `GROQ_API_KEY`
 - `MONGODB_URI`
 - `ADMIN_PASSWORD`（可選）
 
