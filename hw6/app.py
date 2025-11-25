@@ -103,18 +103,25 @@ def webhook():
     try:
         # Handle webhook events
         if handler is None:
+            print("⚠️ LINE Bot handler not initialized")
             return jsonify({"error": "LINE Bot handler not initialized. Check environment variables."}), 500
+        
+        if not line_bot_api:
+            print("⚠️ LINE Bot API not initialized")
+            return jsonify({"error": "LINE Bot API not initialized. Check environment variables."}), 500
+        
         handler.handle(body, signature)
-        print("Webhook handled successfully")
+        print("✅ Webhook handled successfully")
     except InvalidSignatureError:
         # Invalid signature - return 400
-        print("Invalid signature. Check your channel secret.")
+        print("❌ Invalid signature. Check your channel secret.")
         return jsonify({"error": "Invalid signature"}), 400
     except Exception as e:
-        # Other errors
-        print(f"Webhook error: {str(e)}")
+        # Other errors - log but return 200 to prevent LINE from retrying
+        print(f"❌ Webhook error: {str(e)}")
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        # Return 200 to prevent LINE from retrying failed requests
+        return jsonify({"status": "error", "message": str(e)}), 200
     
     return jsonify({"status": "ok"}), 200
 
