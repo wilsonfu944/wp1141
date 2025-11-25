@@ -6,7 +6,7 @@ export default function Home() {
       <div className="max-w-2xl w-full bg-white rounded-lg shadow-xl p-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
           海龜湯 LINE Bot
-        </h1>
+          </h1>
         <p className="text-lg text-gray-600 mb-8 text-center">
           一個使用 AI 的海龜湯推理遊戲機器人
         </p>
@@ -34,7 +34,7 @@ export default function Home() {
             >
               前往管理後台
             </Link>
-          </div>
+        </div>
         </div>
       </div>
     </div>

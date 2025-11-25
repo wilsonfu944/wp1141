@@ -25,14 +25,14 @@
 
 ```env
 # LINE Bot Configuration
-LINE_CHANNEL_SECRET=your_channel_secret
-LINE_CHANNEL_ACCESS_TOKEN=your_channel_access_token
+LINE_CHANNEL_SECRET=
+LINE_CHANNEL_ACCESS_TOKEN=
 
 # Google Gemini API
-GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=
 
 # MongoDB
-MONGODB_URI=your_mongodb_connection_string
+MONGODB_URI=
 
 # Admin Dashboard Password (optional)
 ADMIN_PASSWORD=admin123
