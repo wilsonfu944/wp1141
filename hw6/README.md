@@ -1,0 +1,129 @@
+# 海龜湯 LINE Bot
+
+一個整合 Google Gemini AI 的海龜湯推理遊戲 LINE Bot，使用 Next.js 開發並部署至 Vercel。
+
+## 功能特色
+
+- 🎮 **海龜湯遊戲**：AI 莊家提供謎題，玩家通過提問找出真相
+- 🤖 **AI 驅動**：使用 Google Gemini API 提供智能回應
+- 💬 **對話管理**：完整的對話紀錄與狀態追蹤
+- 📊 **管理後台**：即時監控對話、檢視統計、管理歷程
+- 🔄 **優雅降級**：LLM 服務失效時提供友善的降級回覆
+- ⚡ **即時更新**：後台可即時看到新訊息/新會話
+
+## 技術架構
+
+- **框架**：Next.js 14 (App Router) + TypeScript
+- **資料庫**：MongoDB Atlas + Mongoose
+- **AI 服務**：Google Gemini API
+- **部署**：Vercel
+- **樣式**：Tailwind CSS
+
+## 環境變數設定
+
+在 `.env.local` 檔案中設定以下環境變數：
+
+```env
+# LINE Bot Configuration
+LINE_CHANNEL_SECRET=your_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN=your_channel_access_token
+
+# Google Gemini API
+GEMINI_API_KEY=your_gemini_api_key
+
+# MongoDB
+MONGODB_URI=your_mongodb_connection_string
+
+# Admin Dashboard Password (optional)
+ADMIN_PASSWORD=admin123
+```
+
+## 本地開發
+
+1. 安裝依賴：
+```bash
+npm install
+```
+
+2. 設定環境變數（建立 `.env.local` 檔案）
+
+3. 啟動開發伺服器：
+```bash
+npm run dev
+```
+
+4. 訪問 `http://localhost:3000`
+
+## LINE Bot 設定
+
+1. 前往 [LINE Developers Console](https://developers.line.biz/console/)
+2. 建立新的 Provider 和 Channel
+3. 取得 Channel Secret 和 Channel Access Token
+4. 設定 Webhook URL：`https://your-domain.vercel.app/api/line`
+5. 啟用 Webhook
+
+## 部署至 Vercel
+
+1. 將專案推送到 GitHub
+2. 在 Vercel 中匯入專案
+3. 設定環境變數
+4. 部署完成後，更新 LINE Webhook URL
+
+## API 端點
+
+- `POST /api/line` - LINE Webhook 端點
+- `GET /api/line` - Webhook 健康檢查
+- `GET /api/health` - 系統健康檢查
+- `GET /api/admin/conversations` - 取得對話列表（支援篩選）
+- `GET /api/admin/conversations/[id]` - 取得對話詳情
+
+## 管理後台
+
+訪問 `/admin` 路徑可進入管理後台，功能包括：
+
+- 對話列表與篩選（使用者、日期、關鍵字）
+- 統計數據（總對話數、活躍使用者、總訊息數）
+- 對話詳情與訊息時間軸
+- 即時更新（每 5 秒自動刷新）
+
+## 遊戲流程
+
+1. 使用者輸入「開始」開始新遊戲
+2. Bot 隨機選擇一個海龜湯謎題
+3. 使用者可以：
+   - 提問（Bot 回答「是」、「不是」或「無關」）
+   - 要求提示
+   - 查看當前謎題
+   - 重新開始
+4. 當使用者猜出答案時，Bot 會確認並解釋完整故事
+
+## 專案結構
+
+```
+├── app/
+│   ├── api/
+│   │   ├── line/              # LINE Webhook
+│   │   ├── health/             # 健康檢查
+│   │   └── admin/              # 管理後台 API
+│   ├── admin/                  # 管理後台頁面
+│   └── page.tsx                 # 首頁
+├── lib/
+│   ├── db/                     # 資料庫連接與模型
+│   ├── services/               # 業務邏輯服務
+│   ├── logger.ts               # 日誌工具
+│   └── errors.ts               # 錯誤處理
+└── README.md
+```
+
+## 錯誤處理
+
+系統包含完整的錯誤處理機制：
+
+- LLM API 配額/速率限制檢測
+- 資料庫連接錯誤處理
+- LINE API 錯誤處理
+- 優雅降級與友善錯誤訊息
+
+## 授權
+
+本專案為作業專案，僅供學習使用。
