@@ -35,8 +35,13 @@ def get_conversation_service():
             _conversation_service = ConversationService()
         except Exception as e:
             print(f"Warning: Failed to initialize ConversationService: {e}")
-            # Return a mock service that will fail gracefully
-            raise
+            import traceback
+            traceback.print_exc()
+            # Don't raise here, let it fail when actually used
+            # This allows the app to start even if MongoDB is not available
+            pass
+    if _conversation_service is None:
+        raise RuntimeError("ConversationService not initialized. Check MongoDB connection.")
     return _conversation_service
 
 
