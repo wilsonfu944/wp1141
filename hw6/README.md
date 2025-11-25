@@ -1,7 +1,13 @@
 # 海龜湯 LINE Bot
 
-一個整合 Google Gemini AI 的海龜湯推理遊戲 LINE Bot，使用 Next.js 開發並部署至 Vercel。
+一個整合 Google Gemini AI 的海龜湯推理遊戲 LINE Bot，使用 Next.js 開發並部署至 Vercel。![alt text](https://qr-official.line.me/sid/L/089zdkfo.png)
 
+# LINE Bot QR Code
+
+![LINE Bot QR Code](./images/qr-code.png)
+
+
+Production URL：sea-turtle-soup-bot.vercel.app
 ## 功能特色
 
 - 🎮 **海龜湯遊戲**：AI 莊家提供謎題，玩家通過提問找出真相
@@ -64,10 +70,53 @@ npm run dev
 
 ## 部署至 Vercel
 
-1. 將專案推送到 GitHub
-2. 在 Vercel 中匯入專案
-3. 設定環境變數
-4. 部署完成後，更新 LINE Webhook URL
+### 步驟 1：準備 GitHub Repository
+1. 初始化 Git（如果還沒有）：
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   ```
+
+2. 在 GitHub 建立新的 repository
+
+3. 推送程式碼到 GitHub：
+   ```bash
+   git remote add origin <your-github-repo-url>
+   git branch -M main
+   git push -u origin main
+   ```
+
+### 步驟 2：在 Vercel 部署
+1. 前往 [Vercel](https://vercel.com) 並登入
+2. 點擊 "Add New Project"
+3. 匯入你的 GitHub repository
+4. 設定專案：
+   - Framework Preset: Next.js
+   - Root Directory: `./`
+   - Build Command: `npm run build`（預設）
+   - Output Directory: `.next`（預設）
+
+### 步驟 3：設定環境變數
+在 Vercel 專案設定中的 "Environment Variables" 添加：
+- `LINE_CHANNEL_SECRET`
+- `LINE_CHANNEL_ACCESS_TOKEN`
+- `GEMINI_API_KEY`
+- `MONGODB_URI`
+- `ADMIN_PASSWORD`（可選）
+
+### 步驟 4：部署與測試
+1. 點擊 "Deploy" 開始部署
+2. 等待部署完成（通常 1-2 分鐘）
+3. 取得部署 URL（例如：`https://your-project.vercel.app`）
+
+### 步驟 5：設定 LINE Webhook
+1. 前往 [LINE Developers Console](https://developers.line.biz/console/)
+2. 選擇你的 Channel
+3. 在 "Messaging API" 標籤中找到 "Webhook URL"
+4. 設定為：`https://your-project.vercel.app/api/line`
+5. 點擊 "Verify" 確認 webhook 可連接
+6. 啟用 "Use webhook"
 
 ## API 端點
 
