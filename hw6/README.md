@@ -3,6 +3,8 @@
 一個使用 Python Flask 開發的 LINE Bot，扮演使用者的男女朋友，提供陪伴、關心和支持。支援多種人格切換，使用 LLM (Groq) 生成自然對話。
 Line Bot URL:https://line.me/R/ti/p/%40509iznds
 <img width="450" height="448" alt="image" src="https://github.com/user-attachments/assets/b928ac28-8792-4418-924d-e270ba43e066" />
+
+
 Production URL:https://wp1141-rn3o.vercel.app/admin
 
 ## 📋 目錄
