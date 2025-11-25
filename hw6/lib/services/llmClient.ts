@@ -21,20 +21,43 @@ export async function generateResponse(
 ): Promise<string> {
   try {
     const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
+    
+    // Try gemini-1.5-flash first (faster and more available), fallback to gemini-pro
+    let model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
     // Convert messages to Gemini format
     const prompt = buildPrompt(messages, systemPrompt);
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    try {
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
-    if (!text || text.trim().length === 0) {
-      throw new LLMError('Empty response from Gemini');
+      if (!text || text.trim().length === 0) {
+        throw new LLMError('Empty response from Gemini');
+      }
+
+      return text.trim();
+    } catch (modelError: unknown) {
+      // If 404 (model not found), try gemini-pro as fallback
+      if (
+        (modelError && typeof modelError === 'object' && 'status' in modelError && modelError.status === 404) ||
+        (modelError instanceof Error && (modelError.message.includes('404') || modelError.message.includes('Not Found')))
+      ) {
+        log.warn('gemini-1.5-flash not available, trying gemini-pro', { error: modelError });
+        model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        if (!text || text.trim().length === 0) {
+          throw new LLMError('Empty response from Gemini');
+        }
+
+        return text.trim();
+      }
+      throw modelError;
     }
-
-    return text.trim();
   } catch (error: unknown) {
     log.error('Gemini API error', { error });
 
