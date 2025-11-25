@@ -31,7 +31,7 @@ LINE_CHANNEL_ACCESS_TOKEN=
 # Google Gemini API
 GEMINI_API_KEY=
 
-# MongoDB
+# MongoDB n
 MONGODB_URI=
 
 # Admin Dashboard Password (optional)
@@ -127,3 +127,4 @@ npm run dev
 ## 授權
 
 本專案為作業專案，僅供學習使用。
+qqqqqq
