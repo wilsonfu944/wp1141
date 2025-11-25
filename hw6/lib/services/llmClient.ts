@@ -44,10 +44,10 @@ export async function generateResponse(
       });
     }
 
-    // Use llama-3.1-70b-versatile or mixtral-8x7b-32768
+    // Use llama-3.1-8b-instant (stable and high-performance model)
     const completion = await groq.chat.completions.create({
       messages: groqMessages,
-      model: 'llama-3.1-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       temperature: 0.7,
       max_tokens: 500,
     });
@@ -64,6 +64,10 @@ export async function generateResponse(
 
     // Handle specific error types
     if (error && typeof error === 'object') {
+      // Check for 400 (bad request - model disabled or invalid)
+      if ('status' in error && error.status === 400) {
+        throw new LLMError('模型已停用或請求無效，請檢查模型設定', error);
+      }
       // Check for 404 (model not found)
       if ('status' in error && error.status === 404) {
         throw new LLMError('模型不存在或無法使用，請檢查模型名稱設定', error);
@@ -80,6 +84,9 @@ export async function generateResponse(
 
     // Handle error messages
     if (error instanceof Error) {
+      if (error.message.includes('400') || error.message.includes('Bad Request') || error.message.includes('disabled')) {
+        throw new LLMError('模型已停用或請求無效，請檢查模型設定', error);
+      }
       if (error.message.includes('429') || error.message.includes('quota') || error.message.includes('rate limit')) {
         throw new LLMError('API 配額已用完或達到速率限制，請稍後再試', error);
       }
