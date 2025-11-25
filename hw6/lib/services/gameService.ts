@@ -23,6 +23,60 @@ const PUZZLES = [
     story: '一個男人走進一個房間，房間裡有一張床、一張桌子、一把椅子。他躺在床上，然後死了。為什麼？',
     answer: '這個房間是一個電梯，當他走進去時，電梯開始上升。他躺在床上（實際上是電梯的地板），然後電梯墜落，他死了。',
   },
+  {
+    id: 'puzzle-4',
+    title: '自殺',
+    story: '一個男人在沙漠中自殺了。他的身邊有一根斷掉的木棍和一個背包。為什麼？',
+    answer: '這個男人和朋友一起跳傘，但只有一個降落傘。他們抽籤決定誰用降落傘，輸的人用木棍。結果他抽到木棍，從飛機上跳下來自殺了。',
+  },
+  {
+    id: 'puzzle-5',
+    title: '電話',
+    story: '一個男人接到電話，聽完後臉色大變，然後自殺了。為什麼？',
+    answer: '這個男人是燈塔管理員。他接到電話說燈塔的燈壞了，但他在燈塔裡，如果燈壞了，他無法看到任何東西。他以為自己失明了，所以自殺了。',
+  },
+  {
+    id: 'puzzle-6',
+    title: '鑰匙',
+    story: '一個男人走進房間，看到地上有一把鑰匙。他撿起來，然後自殺了。為什麼？',
+    answer: '這個男人被困在一個房間裡，門被鎖住了。他一直在找鑰匙，但找不到。當他終於找到鑰匙時，發現鑰匙是從房間裡面鎖的，他意識到自己永遠無法逃出去，所以自殺了。',
+  },
+  {
+    id: 'puzzle-7',
+    title: '醫生',
+    story: '一個男人去看醫生，醫生說他得了絕症，只能活三個月。三個月後，他死了，但不是因為疾病。為什麼？',
+    answer: '這個男人是飛行員。醫生告訴他只能活三個月，他決定在最後三個月做自己想做的事。他開飛機去了一個他一直想去的地方，但飛機墜毀了。',
+  },
+  {
+    id: 'puzzle-8',
+    title: '照片',
+    story: '一個男人看到一張照片，然後哭了。為什麼？',
+    answer: '這個男人看到的是他小時候和父親的合照。他發現照片中的「父親」其實是他自己，因為他是一個時間旅行者，回到過去見到了小時候的自己。',
+  },
+  {
+    id: 'puzzle-9',
+    title: '門鈴',
+    story: '一個男人按了門鈴，然後死了。為什麼？',
+    answer: '這個男人是一個小偷，他按了門鈴想看看有沒有人在。但這是一個陷阱，門鈴連接到一個炸彈。當他按門鈴時，炸彈爆炸了。',
+  },
+  {
+    id: 'puzzle-10',
+    title: '鏡子',
+    story: '一個男人走進房間，看到鏡子，然後自殺了。為什麼？',
+    answer: '這個男人是一個盲人，他剛剛做了手術恢復視力。當他第一次看到鏡子中的自己時，他發現自己長得非常醜陋，無法接受這個事實，所以自殺了。',
+  },
+  {
+    id: 'puzzle-11',
+    title: '書',
+    story: '一個男人讀了一本書，然後自殺了。為什麼？',
+    answer: '這個男人是一個作家，他讀的是自己寫的書。當他讀完後，他發現自己寫的書非常糟糕，他無法接受這個事實，所以自殺了。',
+  },
+  {
+    id: 'puzzle-12',
+    title: '窗戶',
+    story: '一個男人站在窗戶前，看著外面，然後跳樓自殺了。為什麼？',
+    answer: '這個男人是一個建築工人，他正在建造一棟大樓。當他站在窗戶前時，他發現自己建造的窗戶沒有玻璃，他意識到自己犯了一個嚴重的錯誤，無法接受，所以跳樓自殺了。',
+  },
 ];
 
 const SYSTEM_PROMPT = `你是一個海龜湯遊戲的莊家。海龜湯是一個推理遊戲，玩家需要通過提問來找出故事背後的真相。
@@ -57,9 +111,9 @@ export async function handleGameMessage(
     return await startNewGame(userId, userName, conversation);
   }
 
-  // 提示
-  if (lowerText === '提示' || lowerText === '我要提示' || lowerText.includes('提示')) {
-    return await giveHint(userId, conversation);
+  // 查看答案
+  if (lowerText === '查看答案' || lowerText === '答案' || lowerText === '我要答案' || lowerText.includes('答案')) {
+    return await showAnswer(userId, conversation);
   }
 
   // 查看當前謎題
@@ -132,13 +186,13 @@ async function startNewGame(
   return {
     reply,
     quickReplies: [
-      { label: '我要提示', text: '提示' },
+      { label: '查看答案', text: '查看答案' },
       { label: '重新開始', text: '重新開始' },
     ],
   };
 }
 
-async function giveHint(
+async function showAnswer(
   userId: string,
   conversation: IConversation | null
 ): Promise<{ reply: string; quickReplies?: Array<{ label: string; text: string }> }> {
@@ -157,27 +211,33 @@ async function giveHint(
     };
   }
 
-  const hintsUsed = conversation.gameState?.hintsUsed || 0;
-  const hints = [
-    '試著思考故事中的細節，哪些地方看起來不合理？',
-    '注意故事中的人物行為，他們為什麼會這樣做？',
-    '想想故事中沒有直接說明的部分，可能隱藏了什麼？',
-    '答案往往在於理解角色的動機和背景。',
-  ];
-
-  const hint = hints[Math.min(hintsUsed, hints.length - 1)];
-
+  // 標記為已解決
   if (!conversation.gameState) {
     conversation.gameState = {};
   }
-  conversation.gameState.hintsUsed = hintsUsed + 1;
+  conversation.gameState.isSolved = true;
   conversation.lastMessageAt = new Date();
   await conversation.save();
 
+  // 保存查看答案的訊息
+  await Message.create({
+    conversationId: conversation._id,
+    userId,
+    role: 'user',
+    content: '查看答案',
+  });
+
+  await Message.create({
+    conversationId: conversation._id,
+    userId,
+    role: 'assistant',
+    content: `📚 答案：${puzzle.answer}`,
+    metadata: { isHint: true },
+  });
+
   return {
-    reply: `💡 提示：${hint}`,
+    reply: `📚 **答案揭曉**\n\n${puzzle.answer}\n\n想挑戰其他謎題嗎？輸入「開始」來開始新的遊戲吧！`,
     quickReplies: [
-      { label: '繼續提問', text: '繼續' },
       { label: '重新開始', text: '重新開始' },
     ],
   };
@@ -205,8 +265,8 @@ async function showCurrentPuzzle(
   return {
     reply: `📖 當前謎題：${puzzle.title}\n\n${puzzle.story}`,
     quickReplies: [
-      { label: '我要提示', text: '提示' },
-      { label: '繼續提問', text: '繼續' },
+      { label: '查看答案', text: '查看答案' },
+      { label: '重新開始', text: '重新開始' },
     ],
   };
 }
@@ -317,7 +377,7 @@ async function handleGameQuestion(
     return {
       reply: llmResponse,
       quickReplies: [
-        { label: '我要提示', text: '提示' },
+        { label: '查看答案', text: '查看答案' },
         { label: '重新開始', text: '重新開始' },
       ],
     };
