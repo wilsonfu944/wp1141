@@ -9,6 +9,7 @@ import Footer from '../components/Layout/Footer';
 import ImageSlider from '../components/ImageSlider/ImageSlider';
 import CommentList from '../components/Comment/CommentList';
 import RatingStars from '../components/Rating/RatingStars';
+import RatingDisplay from '../components/Rating/RatingDisplay';
 import { useState, useEffect } from 'react';
 
 export default function LocationDetailPage() {
@@ -143,6 +144,11 @@ export default function LocationDetailPage() {
                   {location.episode && (
                     <p className="text-slate-300 mb-4">第 {location.episode} 話</p>
                   )}
+                  
+                  {/* 評分顯示 */}
+                  <div className="mb-4">
+                    <RatingDisplay type="location" id={location.id} size="lg" />
+                  </div>
                 </div>
 
 

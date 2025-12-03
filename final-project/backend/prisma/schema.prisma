@@ -18,26 +18,39 @@ model User {
   avatar           String?            // 頭像 URL
   bio              String?            // 個人簡介
   favorites        Favorite[]
+  favoriteAnimes   FavoriteAnime[]
   comments         Comment[]
   commentLikes     CommentLike[]
+  animeRatings     AnimeRating[]
+  locationRatings  LocationRating[] @relation("LocationRatings")
   itineraries      Itinerary[]
   itineraryLikes   ItineraryLike[]
   itineraryComments ItineraryComment[]
+  forumPosts       ForumPost[]
+  forumReplies     ForumReply[]
+  sentMessages     Message[]          @relation("SentMessages")
+  receivedMessages Message[]          @relation("ReceivedMessages")
+  sentFriendRequests     FriendRequest[] @relation("SentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("ReceivedFriendRequests")
+  friendsAsUser1  Friendship[]       @relation("User1Friendships")
+  friendsAsUser2  Friendship[]       @relation("User2Friendships")
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 }
 
 model Anime {
-  id          String     @id @default(cuid())
-  name        String     @unique
-  nameEn      String?    // 英文名稱
-  year        Int?       // 年份
-  genre       String?    // 類型
-  description String?    // 簡介
-  coverImage  String?    // 封面圖 URL
+  id          String       @id @default(cuid())
+  name        String       @unique
+  nameEn      String?      // 英文名稱
+  year        Int?         // 年份
+  genre       String?      // 類型
+  description String?      // 簡介
+  coverImage  String?      // 封面圖 URL
   locations   Location[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  ratings     AnimeRating[]
+  favoriteAnimes FavoriteAnime[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Location {
@@ -54,6 +67,7 @@ model Location {
   description    String?         // 描述
   favorites      Favorite[]
   comments       Comment[]
+  locationRatings LocationRating[]
   itineraryItems ItineraryItem[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -119,6 +133,7 @@ model Itinerary {
   items       ItineraryItem[]
   likes       ItineraryLike[]
   comments    ItineraryComment[]
+  messages    Message[]          // 相關私訊
   viewCount   Int                @default(0)
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
@@ -156,5 +171,117 @@ model ItineraryComment {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   content     String
   createdAt   DateTime  @default(now())
+}
+
+// 留言板（論壇）功能
+model ForumPost {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String        // 標題
+  content     String        // 內容
+  category    String?       // 分類（如：找旅伴、討論、分享等）
+  viewCount   Int           @default(0)
+  likeCount   Int           @default(0)
+  replies     ForumReply[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ForumReply {
+  id          String     @id @default(cuid())
+  postId      String
+  post        ForumPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String     // 回覆內容
+  parentId    String?    // 回覆的父回覆 ID（支援多層回覆）
+  parent      ForumReply? @relation("ReplyReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     ForumReply[] @relation("ReplyReplies")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+// 動漫評分
+model AnimeRating {
+  id        String   @id @default(cuid())
+  animeId   String
+  anime     Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int      // 評分 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([animeId, userId]) // 每個用戶對每個動漫只能評分一次
+}
+
+// 地點評分（獨立於評論評分）
+model LocationRating {
+  id         String   @id @default(cuid())
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation("LocationRatings", fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int      // 評分 1-5
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([locationId, userId]) // 每個用戶對每個地點只能評分一次
+}
+
+// 喜歡的動畫（非聖地）
+model FavoriteAnime {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animeId   String
+  anime     Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, animeId]) // 防止重複收藏
+}
+
+// 好友關係
+model Friendship {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user1     User     @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id   String
+  user2     User     @relation("User2Friendships", fields: [user2Id], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([user1Id, user2Id]) // 防止重複好友關係
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+// 好友請求
+model FriendRequest {
+  id        String   @id @default(cuid())
+  senderId  String
+  sender    User     @relation("SentFriendRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver  User     @relation("ReceivedFriendRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status    String   @default("pending") // pending, accepted, rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([senderId, receiverId]) // 防止重複請求
+  @@index([receiverId, status])
+}
+
+// 私訊功能
+model Message {
+  id          String   @id @default(cuid())
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  content     String   // 訊息內容
+  isRead      Boolean  @default(false)
+  itineraryId String?  // 關聯的行程 ID（方便找旅伴）
+  itinerary   Itinerary? @relation(fields: [itineraryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
 }
 

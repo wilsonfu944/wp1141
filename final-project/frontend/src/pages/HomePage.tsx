@@ -1,12 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Star } from 'lucide-react';
-import { animesAPI, locationsAPI } from '../services/api';
+import { TrendingUp, Star, Heart } from 'lucide-react';
+import { animesAPI, locationsAPI, favoriteAnimesAPI } from '../services/api';
 import type { Anime, Location } from '../types';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
+import AnimeCarousel from '../components/Carousel/AnimeCarousel';
+import { useAuth } from '../context/AuthContext';
+import AnimeCard from '../components/Anime/AnimeCard';
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuth();
+  
   const { data: animes = [] } = useQuery<Anime[]>({
     queryKey: ['animes'],
     queryFn: () => animesAPI.getAll(),
@@ -15,6 +20,12 @@ export default function HomePage() {
   const { data: locations = [] } = useQuery<Location[]>({
     queryKey: ['locations'],
     queryFn: () => locationsAPI.getAll(),
+  });
+
+  const { data: favoriteAnimes = [] } = useQuery<Anime[]>({
+    queryKey: ['favorite-animes'],
+    queryFn: () => favoriteAnimesAPI.getAll(),
+    enabled: isAuthenticated,
   });
 
   // 取得前 6 個動畫作為推薦
@@ -27,6 +38,13 @@ export default function HomePage() {
       <Navbar />
 
       <main className="flex-1">
+        {/* Anime Carousel */}
+        <section className="py-8 px-4">
+          <div className="container mx-auto">
+            <AnimeCarousel animes={animes} autoPlayInterval={5000} />
+          </div>
+        </section>
+
         {/* Featured Animes */}
         <section className="py-16 px-4">
           <div className="container mx-auto">
@@ -81,6 +99,31 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* My Favorites - 只有登入用戶才顯示 */}
+        {isAuthenticated && favoriteAnimes.length > 0 && (
+          <section className="py-16 px-4">
+            <div className="container mx-auto">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+                  <Heart className="w-8 h-8 text-pink-500 fill-pink-500" />
+                  我的最愛
+                </h2>
+                <Link
+                  to="/animes"
+                  className="text-pink-500 hover:text-pink-400 transition-colors"
+                >
+                  查看全部 →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {favoriteAnimes.slice(0, 6).map((anime) => (
+                  <AnimeCard key={anime.id} anime={anime} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Popular Locations */}
         <section className="py-16 px-4 bg-slate-800/30">

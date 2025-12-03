@@ -12,6 +12,11 @@ import ExploreItinerariesPage from './pages/ExploreItinerariesPage';
 import AnimeListPage from './pages/AnimeListPage';
 import AnimeDetailPage from './pages/AnimeDetailPage';
 import LocationDetailPage from './pages/LocationDetailPage';
+import ForumPage from './pages/ForumPage';
+import ForumPostPage from './pages/ForumPostPage';
+import NewForumPostPage from './pages/NewForumPostPage';
+import MessagesPage from './pages/MessagesPage';
+import FriendsPage from './pages/FriendsPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -43,6 +48,11 @@ function App() {
             <Route path="/itineraries/:id" element={<ItineraryDetailPage />} />
             <Route path="/profile/itineraries" element={<MyItinerariesPage />} />
             <Route path="/explore/itineraries" element={<ExploreItinerariesPage />} />
+            <Route path="/forum" element={<ForumPage />} />
+            <Route path="/forum/new" element={<NewForumPostPage />} />
+            <Route path="/forum/:id" element={<ForumPostPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/friends" element={<FriendsPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />

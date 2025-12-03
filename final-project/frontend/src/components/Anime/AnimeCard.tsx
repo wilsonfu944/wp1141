@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Anime } from '../../types';
 import { MapPin } from 'lucide-react';
+import RatingDisplay from '../Rating/RatingDisplay';
 
 interface AnimeCardProps {
   anime: Anime;
@@ -31,8 +32,11 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
           {anime.name}
         </h3>
         {anime.nameEn && (
-          <p className="text-sm text-slate-400 mb-3 line-clamp-1">{anime.nameEn}</p>
+          <p className="text-sm text-slate-400 mb-2 line-clamp-1">{anime.nameEn}</p>
         )}
+        <div className="mb-2">
+          <RatingDisplay type="anime" id={anime.id} size="sm" showText={false} />
+        </div>
         <div className="flex items-center gap-2 text-slate-500 text-sm">
           <MapPin className="w-4 h-4" />
           <span>{anime.locations?.length || 0} 個地點</span>

@@ -8,6 +8,12 @@ import favoriteRoutes from './routes/favorites';
 import commentRoutes from './routes/comments';
 import itineraryRoutes from './routes/itineraries';
 import exportRoutes from './routes/export';
+import forumRoutes from './routes/forum';
+import messageRoutes from './routes/messages';
+import ratingRoutes from './routes/ratings';
+import aiRoutes from './routes/ai';
+import favoriteAnimeRoutes from './routes/favoriteAnimes';
+import friendRoutes from './routes/friends';
 
 dotenv.config();
 
@@ -26,6 +32,12 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/itineraries', itineraryRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/forum', forumRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/favorite-animes', favoriteAnimeRoutes);
+app.use('/api/friends', friendRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

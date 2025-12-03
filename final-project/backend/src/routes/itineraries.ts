@@ -43,8 +43,8 @@ router.post('/optimize', async (req, res) => {
       },
     });
 
-    // 優化路線
-    const result = optimizeRoute(
+    // 優化路線（現在是異步的）
+    const result = await optimizeRoute(
       locations.map((l) => ({ ...l, duration: 30 })),
       transport || 'public'
     );

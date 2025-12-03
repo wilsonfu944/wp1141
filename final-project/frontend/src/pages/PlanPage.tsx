@@ -10,7 +10,7 @@ import LocationListEditor from '../components/Itinerary/LocationListEditor';
 import PlanSettings from '../components/Itinerary/PlanSettings';
 
 export default function PlanPage() {
-  const { items, removeItem, updateItem, clearCart, reorderItems } = useItineraryCart();
+  const { items, removeItem, updateItem, clearCart, reorderItems, setItemsOrder } = useItineraryCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -21,8 +21,9 @@ export default function PlanPage() {
   const [isPublic, setIsPublic] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [optimizedRoute, setOptimizedRoute] = useState<{ totalDistance: number; segments: Array<{ from: string; to: string; distance: number; travelTime: number }> } | null>(null);
 
-  const totalDistance = 0; // 待計算
+  const totalDistance = optimizedRoute?.totalDistance || 0;
   const totalTime = items.reduce((sum, item) => sum + (item.duration || 30), 0);
 
   const handleOptimize = async () => {
@@ -36,20 +37,36 @@ export default function PlanPage() {
       const locationIds = items.map((item) => item.location.id);
       const result = await itinerariesAPI.optimize(locationIds, transport);
       
-      // 根據優化結果重新排序
-      const orderedItems = result.order
-        .map((id) => items.find((item) => item.location.id === id))
-        .filter((item) => item !== undefined);
-      
-      // 重新排序清單
-      orderedItems.forEach((item, index) => {
-        const currentIndex = items.findIndex((i) => i.location.id === item!.location.id);
-        if (currentIndex !== index) {
-          reorderItems(currentIndex, index);
-        }
+      // 儲存優化結果
+      setOptimizedRoute({
+        totalDistance: result.totalDistance,
+        segments: result.segments,
       });
-
-      alert(`路線已優化！總距離：${result.totalDistance.toFixed(1)} km`);
+      
+      // 根據優化結果重新排序項目
+      const newOrder: typeof items = [];
+      result.order.forEach((id) => {
+        const item = items.find((i) => i.location.id === id);
+        if (item) newOrder.push(item);
+      });
+      
+      // 使用批量重新排序方法
+      if (newOrder.length === items.length) {
+        setItemsOrder(newOrder);
+      }
+      
+      // 顯示詳細的優化結果
+      const transportText = transport === 'walking' ? '步行' : transport === 'public' ? '大眾運輸' : '開車';
+      let message = `路線已優化！\n\n總距離：${result.totalDistance.toFixed(1)} km\n總移動時間：${Math.floor(result.totalTravelTime)} 分鐘\n\n路線順序：\n`;
+      
+      result.segments.forEach((segment, index) => {
+        const fromLocation = items.find((item) => item.location.id === segment.from);
+        const toLocation = items.find((item) => item.location.id === segment.to);
+        message += `${index + 1}. ${fromLocation?.location.name || '起點'} → ${toLocation?.location.name || '終點'}\n`;
+        message += `   距離：${segment.distance.toFixed(1)} km，時間：${Math.floor(segment.travelTime)} 分鐘（${transportText}）\n\n`;
+      });
+      
+      alert(message);
     } catch (error) {
       console.error('Optimize error:', error);
       alert('優化失敗，請稍後再試');
@@ -96,13 +113,19 @@ export default function PlanPage() {
         })),
       });
 
+      // 先清空狀態，再導航，避免狀態衝突
       clearCart();
-      alert('行程已儲存！');
-      navigate(`/itineraries/${itinerary.id}`);
-    } catch (error) {
+      setOptimizedRoute(null);
+      setName('');
+      setDescription('');
+      setStartDate('');
+      
+      // 使用 window.location 確保完全導航，避免 React Router 狀態問題
+      window.location.href = `/itineraries/${itinerary.id}`;
+    } catch (error: any) {
       console.error('Save error:', error);
-      alert('儲存失敗，請稍後再試');
-    } finally {
+      const errorMessage = error?.response?.data?.error || error?.message || '儲存失敗，請稍後再試';
+      alert(`儲存失敗：${errorMessage}`);
       setSaving(false);
     }
   };

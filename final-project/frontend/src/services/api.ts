@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { User, Location, Anime, Favorite, AuthResponse, Comment, Itinerary, OptimizedRoute } from '../types';
+import type { User, Location, Anime, Favorite, AuthResponse, Comment, Itinerary, ItineraryComment, OptimizedRoute, ForumPost, ForumReply, Message, Conversation } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -168,11 +168,164 @@ export const itinerariesAPI = {
   unlike: async (id: string): Promise<void> => {
     await api.delete(`/itineraries/${id}/like`);
   },
-  addComment: async (id: string, content: string): Promise<void> => {
-    await api.post(`/itineraries/${id}/comments`, { content });
+  addComment: async (id: string, content: string): Promise<ItineraryComment> => {
+    const response = await api.post<ItineraryComment>(`/itineraries/${id}/comments`, { content });
+    return response.data;
   },
   copy: async (id: string): Promise<Itinerary> => {
     const response = await api.post<Itinerary>(`/itineraries/${id}/copy`);
+    return response.data;
+  },
+};
+
+// Forum API
+export const forumAPI = {
+  getPosts: async (category?: string, sort?: string): Promise<ForumPost[]> => {
+    const params: any = {};
+    if (category) params.category = category;
+    if (sort) params.sort = sort;
+    const response = await api.get<ForumPost[]>('/forum/posts', { params });
+    return response.data;
+  },
+  getPostById: async (id: string): Promise<ForumPost> => {
+    const response = await api.get<ForumPost>(`/forum/posts/${id}`);
+    return response.data;
+  },
+  createPost: async (data: { title: string; content: string; category?: string }): Promise<ForumPost> => {
+    const response = await api.post<ForumPost>('/forum/posts', data);
+    return response.data;
+  },
+  createReply: async (postId: string, data: { content: string; parentId?: string }): Promise<ForumReply> => {
+    const response = await api.post<ForumReply>(`/forum/posts/${postId}/replies`, data);
+    return response.data;
+  },
+  likePost: async (id: string): Promise<void> => {
+    await api.post(`/forum/posts/${id}/like`);
+  },
+};
+
+// Messages API
+export const messagesAPI = {
+  getConversations: async (): Promise<Conversation[]> => {
+    const response = await api.get<Conversation[]>('/messages/conversations');
+    return response.data;
+  },
+  getConversation: async (userId: string): Promise<Message[]> => {
+    const response = await api.get<Message[]>(`/messages/conversations/${userId}`);
+    return response.data;
+  },
+  sendMessage: async (data: { receiverId: string; content: string; itineraryId?: string }): Promise<Message> => {
+    const response = await api.post<Message>('/messages', data);
+    return response.data;
+  },
+  markAsRead: async (id: string): Promise<void> => {
+    await api.put(`/messages/${id}/read`);
+  },
+  getUnreadCount: async (): Promise<{ count: number }> => {
+    const response = await api.get<{ count: number }>('/messages/unread/count');
+    return response.data;
+  },
+};
+
+// AI API
+export const aiAPI = {
+  chat: async (message: string, conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>): Promise<{ response: string }> => {
+    const response = await api.post<{ response: string }>('/ai/chat', {
+      message,
+      conversationHistory,
+    });
+    return response.data;
+  },
+};
+
+// Favorite Animes API
+export const favoriteAnimesAPI = {
+  getAll: async (): Promise<Anime[]> => {
+    const response = await api.get<Anime[]>('/favorite-animes');
+    return response.data;
+  },
+  add: async (animeId: string): Promise<Anime> => {
+    const response = await api.post<Anime>(`/favorite-animes/${animeId}`);
+    return response.data;
+  },
+  remove: async (animeId: string): Promise<void> => {
+    await api.delete(`/favorite-animes/${animeId}`);
+  },
+  check: async (animeId: string): Promise<{ isFavorited: boolean }> => {
+    const response = await api.get<{ isFavorited: boolean }>(`/favorite-animes/${animeId}/check`);
+    return response.data;
+  },
+};
+
+// Friends API
+export interface FriendRecommendation {
+  user: User;
+  commonAnimeCount: number;
+  commonAnimes: Anime[];
+}
+
+export interface FriendRequest {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: string;
+  sender?: User;
+  receiver?: User;
+  createdAt: string;
+}
+
+export const friendsAPI = {
+  getAll: async (): Promise<User[]> => {
+    const response = await api.get<User[]>('/friends');
+    return response.data;
+  },
+  sendRequest: async (receiverId: string): Promise<FriendRequest> => {
+    const response = await api.post<FriendRequest>(`/friends/request/${receiverId}`);
+    return response.data;
+  },
+  getRequests: async (): Promise<FriendRequest[]> => {
+    const response = await api.get<FriendRequest[]>('/friends/requests');
+    return response.data;
+  },
+  handleRequest: async (requestId: string, action: 'accept' | 'reject'): Promise<void> => {
+    await api.put(`/friends/request/${requestId}`, { action });
+  },
+  getRecommendations: async (): Promise<FriendRecommendation[]> => {
+    const response = await api.get<FriendRecommendation[]>('/friends/recommendations');
+    return response.data;
+  },
+};
+
+// Ratings API
+export const ratingsAPI = {
+  rateAnime: async (animeId: string, rating: number): Promise<void> => {
+    await api.post(`/ratings/anime/${animeId}`, { rating });
+  },
+  getAnimeRating: async (animeId: string): Promise<{
+    averageRating: number;
+    totalRatings: number;
+    userRating: number | null;
+  }> => {
+    const response = await api.get<{
+      averageRating: number;
+      totalRatings: number;
+      userRating: number | null;
+    }>(`/ratings/anime/${animeId}`);
+    return response.data;
+  },
+  rateLocation: async (locationId: string, rating: number): Promise<void> => {
+    await api.post(`/ratings/location/${locationId}`, { rating });
+  },
+  getLocationRating: async (locationId: string): Promise<{
+    averageRating: number;
+    totalRatings: number;
+    userRating: number | null;
+  }> => {
+    const response = await api.get<{
+      averageRating: number;
+      totalRatings: number;
+      userRating: number | null;
+    }>(`/ratings/location/${locationId}`);
     return response.data;
   },
 };

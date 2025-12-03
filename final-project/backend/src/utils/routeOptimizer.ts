@@ -1,4 +1,6 @@
-// Haversine 公式計算兩點間的距離（公里）
+import { calculateGoogleMapsDistance } from './googleMapsDistance';
+
+// Haversine 公式計算兩點間的距離（公里）- 作為備用
 function calculateDistance(
   lat1: number,
   lon1: number,
@@ -152,12 +154,13 @@ function calculateRouteDistance(locations: Location[], route: string[]): number 
 /**
  * 優化路線順序
  * 綜合考慮距離和時間
+ * 使用 Google Maps API 計算真實距離和時間（如果可用）
  */
-export function optimizeRoute(
+export async function optimizeRoute(
   locations: Location[],
   transport: string = 'public',
   startDate?: Date
-): OptimizedRoute {
+): Promise<OptimizedRoute> {
   if (locations.length === 0) {
     return {
       order: [],
@@ -184,8 +187,7 @@ export function optimizeRoute(
   // 步驟 2：使用 2-opt 演算法優化
   optimizedOrder = twoOptImprove(locations, optimizedOrder);
 
-  // 步驟 3：計算路線詳細資訊
-  const speed = TRANSPORT_SPEEDS[transport] || 30;
+  // 步驟 3：計算路線詳細資訊（使用 Google Maps API 如果可用）
   const locationMap = new Map(locations.map((l) => [l.id, l]));
   const segments: OptimizedRoute['segments'] = [];
   let totalDistance = 0;
@@ -197,23 +199,44 @@ export function optimizeRoute(
     const to = locationMap.get(optimizedOrder[i + 1]);
 
     if (from && to) {
-      const distance = calculateDistance(
-        from.latitude,
-        from.longitude,
-        to.latitude,
-        to.longitude
-      );
-      const travelTime = (distance / speed) * 60; // 轉換為分鐘
+      // 嘗試使用 Google Maps API，如果失敗則使用 Haversine
+      try {
+        const result = await calculateGoogleMapsDistance(
+          { latitude: from.latitude, longitude: from.longitude },
+          { latitude: to.latitude, longitude: to.longitude },
+          transport as 'walking' | 'public' | 'driving'
+        );
 
-      segments.push({
-        from: from.id,
-        to: to.id,
-        distance,
-        travelTime,
-      });
+        segments.push({
+          from: from.id,
+          to: to.id,
+          distance: result.distance,
+          travelTime: result.duration,
+        });
 
-      totalDistance += distance;
-      totalTravelTime += travelTime;
+        totalDistance += result.distance;
+        totalTravelTime += result.duration;
+      } catch (error) {
+        // 回退到 Haversine 公式
+        const speed = TRANSPORT_SPEEDS[transport] || 30;
+        const distance = calculateDistance(
+          from.latitude,
+          from.longitude,
+          to.latitude,
+          to.longitude
+        );
+        const travelTime = (distance / speed) * 60;
+
+        segments.push({
+          from: from.id,
+          to: to.id,
+          distance,
+          travelTime,
+        });
+
+        totalDistance += distance;
+        totalTravelTime += travelTime;
+      }
     }
   }
 

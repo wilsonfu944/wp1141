@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Location } from '../../types';
 import { MapPin, ExternalLink } from 'lucide-react';
+import RatingDisplay from '../Rating/RatingDisplay';
 
 interface LocationCardProps {
   location: Location;
@@ -33,6 +34,9 @@ export default function LocationCard({ location }: LocationCardProps) {
         {location.episode && (
           <p className="text-xs text-slate-500 mb-3">第 {location.episode} 話</p>
         )}
+        <div className="mb-3">
+          <RatingDisplay type="location" id={location.id} size="sm" showText={false} />
+        </div>
         <a
           href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
           target="_blank"

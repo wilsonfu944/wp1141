@@ -141,3 +141,57 @@ export interface OptimizedRoute {
   }[];
 }
 
+export interface ForumPost {
+  id: string;
+  userId: string;
+  user?: User;
+  title: string;
+  content: string;
+  category?: string;
+  viewCount: number;
+  likeCount: number;
+  replies?: ForumReply[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumReply {
+  id: string;
+  postId: string;
+  userId: string;
+  user?: User;
+  content: string;
+  parentId?: string;
+  parent?: ForumReply;
+  replies?: ForumReply[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  sender?: User;
+  receiverId: string;
+  receiver?: User;
+  content: string;
+  isRead: boolean;
+  itineraryId?: string;
+  itinerary?: {
+    id: string;
+    name: string;
+  };
+  createdAt: string;
+}
+
+export interface Conversation {
+  userId: string;
+  user: User;
+  lastMessage: Message;
+  unreadCount: number;
+  itinerary?: {
+    id: string;
+    name: string;
+  };
+}
+

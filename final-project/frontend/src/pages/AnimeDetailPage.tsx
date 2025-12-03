@@ -1,20 +1,56 @@
-import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Map, Calendar, Film } from 'lucide-react';
-import { animesAPI } from '../services/api';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Map, Calendar, Film, Heart } from 'lucide-react';
+import { animesAPI, favoriteAnimesAPI } from '../services/api';
 import type { Anime } from '../types';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import LocationCard from '../components/Location/LocationCard';
+import RatingDisplay from '../components/Rating/RatingDisplay';
+import { useAuth } from '../context/AuthContext';
 
 export default function AnimeDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const [isFavorited, setIsFavorited] = useState(false);
 
   const { data: anime, isLoading } = useQuery<Anime>({
     queryKey: ['anime', id],
     queryFn: () => animesAPI.getById(id!),
     enabled: !!id,
   });
+
+  const { data: favoriteStatus } = useQuery({
+    queryKey: ['favorite-anime-check', id],
+    queryFn: () => favoriteAnimesAPI.check(id!),
+    enabled: !!id && isAuthenticated,
+  });
+
+  useEffect(() => {
+    if (favoriteStatus) {
+      setIsFavorited(favoriteStatus.isFavorited);
+    }
+  }, [favoriteStatus]);
+
+  const favoriteMutation = useMutation({
+    mutationFn: () => (isFavorited ? favoriteAnimesAPI.remove(id!) : favoriteAnimesAPI.add(id!)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorite-anime-check', id] });
+      queryClient.invalidateQueries({ queryKey: ['favorite-animes'] });
+      setIsFavorited(!isFavorited);
+    },
+  });
+
+  const handleToggleFavorite = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    favoriteMutation.mutate();
+  };
 
   if (isLoading) {
     return (
@@ -85,8 +121,13 @@ export default function AnimeDetailPage() {
                   {anime.name}
                 </h1>
                 {anime.nameEn && (
-                  <p className="text-xl text-slate-300 mb-6">{anime.nameEn}</p>
+                  <p className="text-xl text-slate-300 mb-4">{anime.nameEn}</p>
                 )}
+
+                {/* 評分顯示 */}
+                <div className="mb-6">
+                  <RatingDisplay type="anime" id={anime.id} size="lg" />
+                </div>
 
                 <div className="flex flex-wrap gap-4 mb-6">
                   {anime.year && (
@@ -114,13 +155,29 @@ export default function AnimeDetailPage() {
                   </div>
                 )}
 
-                <Link
-                  to={`/map?anime=${anime.id}`}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
-                >
-                  <Map className="w-5 h-5" />
-                  在地圖上查看所有地點
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    to={`/map?anime=${anime.id}`}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
+                  >
+                    <Map className="w-5 h-5" />
+                    在地圖上查看所有地點
+                  </Link>
+                  {isAuthenticated && (
+                    <button
+                      onClick={handleToggleFavorite}
+                      disabled={favoriteMutation.isPending}
+                      className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                        isFavorited
+                          ? 'bg-pink-500 hover:bg-pink-600 text-white'
+                          : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
+                      {isFavorited ? '已加入最愛' : '加入最愛'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

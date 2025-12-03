@@ -12,13 +12,18 @@ import {
   Clock,
   MapPin as MapPinIcon,
   MessageSquare,
+  Send,
+  Car,
+  Footprints,
+  Train,
 } from 'lucide-react';
-import { itinerariesAPI } from '../services/api';
+import { itinerariesAPI, messagesAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import type { Itinerary } from '../types';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import Timeline from '../components/Itinerary/Timeline';
+import ItineraryCommentForm from '../components/Itinerary/ItineraryCommentForm';
 
 export default function ItineraryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -79,6 +84,17 @@ export default function ItineraryDetailPage() {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
     alert('連結已複製到剪貼簿！');
+  };
+
+  const handleSendMessage = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (!itinerary || !itinerary.user) return;
+    
+    // 導航到私訊頁面，並帶上用戶ID和行程ID
+    navigate(`/messages?userId=${itinerary.userId}&itineraryId=${itinerary.id}`);
   };
 
   if (isLoading) {
@@ -203,13 +219,22 @@ export default function ItineraryDetailPage() {
                 匯出
               </a>
                 {!isOwner && (
-                  <button
-                    onClick={handleCopy}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
-                  >
-                    <Copy className="w-5 h-5" />
-                    複製行程
-                  </button>
+                  <>
+                    <button
+                      onClick={handleCopy}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      <Copy className="w-5 h-5" />
+                      複製行程
+                    </button>
+                    <button
+                      onClick={handleSendMessage}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      <Send className="w-5 h-5" />
+                      聯絡作者
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -236,7 +261,13 @@ export default function ItineraryDetailPage() {
               </div>
               <div className="bg-slate-800/50 rounded-lg p-4 text-center">
                 <div className="text-pink-500 text-xl flex items-center justify-center gap-2">
-                  <TransportIcon className="w-6 h-6" />
+                  {itinerary.transport === 'walking' ? (
+                    <Footprints className="w-6 h-6" />
+                  ) : itinerary.transport === 'driving' ? (
+                    <Car className="w-6 h-6" />
+                  ) : (
+                    <Train className="w-6 h-6" />
+                  )}
                   <span className="font-bold">
                     {itinerary.transport === 'walking'
                       ? '步行'
@@ -272,10 +303,61 @@ export default function ItineraryDetailPage() {
               <MessageSquare className="w-6 h-6 text-pink-500" />
               評論 ({itinerary.comments?.length || 0})
             </h3>
-            {/* TODO: 實作評論列表 */}
-            <div className="text-center text-slate-400 py-8">
-              評論功能開發中...
-            </div>
+            
+            {/* 評論表單 */}
+            {isAuthenticated ? (
+              <div className="bg-slate-800/50 rounded-lg p-6 mb-6 border border-slate-700">
+                <ItineraryCommentForm itineraryId={itinerary.id} onSuccess={refetch} />
+              </div>
+            ) : (
+              <div className="bg-slate-800/50 rounded-lg p-6 mb-6 border border-slate-700 text-center">
+                <p className="text-slate-400 mb-4">請先登入才能發表評論</p>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  登入
+                </button>
+              </div>
+            )}
+
+            {/* 評論列表 */}
+            {itinerary.comments && itinerary.comments.length > 0 ? (
+              <div className="space-y-4">
+                {itinerary.comments.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"
+                  >
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={comment.user?.avatar || `https://ui-avatars.com/api/?name=${comment.user?.name || 'User'}`}
+                        alt={comment.user?.name || 'User'}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium text-white">
+                            {comment.user?.name || comment.user?.email || '匿名'}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {new Date(comment.createdAt).toLocaleString('zh-TW')}
+                          </span>
+                          {comment.user?.id === user?.id && (
+                            <span className="text-xs text-pink-400">(你)</span>
+                          )}
+                        </div>
+                        <p className="text-slate-300 whitespace-pre-wrap">{comment.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-slate-400 py-8">
+                還沒有評論，成為第一個評論的人吧！
+              </div>
+            )}
           </div>
         </section>
       </main>

@@ -16,6 +16,7 @@ interface ItineraryCartContextType {
   hasItem: (locationId: string) => boolean;
   totalItems: number;
   reorderItems: (startIndex: number, endIndex: number) => void;
+  setItemsOrder: (newOrder: CartItem[]) => void;
 }
 
 const ItineraryCartContext = createContext<ItineraryCartContextType | undefined>(undefined);
@@ -75,6 +76,10 @@ export function ItineraryCartProvider({ children }: { children: ReactNode }) {
     setItems(result);
   };
 
+  const setItemsOrder = (newOrder: CartItem[]) => {
+    setItems(newOrder);
+  };
+
   return (
     <ItineraryCartContext.Provider
       value={{
@@ -86,6 +91,7 @@ export function ItineraryCartProvider({ children }: { children: ReactNode }) {
         hasItem,
         totalItems: items.length,
         reorderItems,
+        setItemsOrder,
       }}
     >
       {children}
