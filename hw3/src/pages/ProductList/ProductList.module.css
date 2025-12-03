@@ -1,0 +1,82 @@
+.layout {
+  min-height: calc(100vh - 200px);
+  background: #f0f2f5;
+}
+
+.sider {
+  padding: 16px;
+  background: #f0f2f5;
+}
+
+.content {
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+.toolbar {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.resultInfo {
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.count {
+  font-weight: bold;
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.compareInfo {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 24px;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .content {
+    padding: 16px;
+  }
+
+  .toolbar {
+    padding: 12px;
+  }
+
+  .resultInfo {
+    font-size: 13px;
+  }
+
+  .count {
+    font-size: 15px;
+  }
+}
+
+/* 移動端隱藏側邊欄時的提示 */
+@media (max-width: 991px) {
+  .sider {
+    position: fixed;
+    z-index: 999;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}

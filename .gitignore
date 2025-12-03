@@ -22,6 +22,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# TypeScript
+*.tsbuildinfo
+
 # IDE
 .vscode/
 .idea/
@@ -31,9 +34,32 @@ yarn-error.log*
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
+Icon?
 
 # Prisma
 backend/prisma/migrations/
 
+# Coverage directory used by tools like istanbul
+coverage/
 
+# Temporary folders
+tmp/
+temp/
+
+# Backup files
+*.bak
+*.backup
+
+# 排除開發相關檔案
+hw1/package.json
+hw1/compile.sh
+hw1/音樂/
+hw1/照片/
+hw1/*.md
+!hw1/README.md

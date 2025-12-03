@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  places    Place[]
+  trips     Trip[]
+}
+
+model Place {
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String
+  latitude    Float
+  longitude   Float
+  placeId     String?  // Google Place ID
+  notes       String?
+  category    String?  // 景點/餐廳/住宿
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tripDays    TripDay[]
+}
+
+model Trip {
+  id          Int      @id @default(autoincrement())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  description String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  days        TripDay[]
+}
+
+model TripDay {
+  id        Int      @id @default(autoincrement())
+  tripId    Int
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  date      DateTime
+  order     Int      // 當天景點順序
+  placeId   Int
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  notes     String?
+  startTime String?  // 預計時間 (例如: "09:00")
+  endTime   String?  // 結束時間 (例如: "12:00")
+  createdAt DateTime @default(now())
+}
+

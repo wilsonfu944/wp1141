@@ -4,18 +4,24 @@
 
 ## 功能特色
 
-- 🗺️ **全螢幕互動地圖** - 使用 Leaflet 顯示所有動漫取景地點
+- 🗺️ **全螢幕互動地圖** - 使用 Google Maps 顯示所有動漫取景地點
 - 📍 **智慧標記聚合** - 縮小地圖時自動聚合鄰近景點
 - 🖼️ **沉浸式場景對比** - 拖曳滑桿比較動畫截圖與真實照片
 - 🔍 **搜尋與篩選** - 依動畫名稱或地區篩選景點
 - ❤️ **個人收藏** - 收藏想去的景點，建立個人清單
 - 🔐 **使用者認證** - 安全的註冊/登入系統
+- 💬 **留言板與私訊** - 與其他使用者交流，尋找旅伴
+- 🤖 **AI客服小精靈** - 智能助手解答問題
+- 👥 **好友系統** - 加好友、推薦好友（基於共同喜歡的動畫）
+- ⭐ **評分系統** - 為動畫和地點評分
+- 📝 **行程規劃** - 規劃聖地巡禮路線，智能優化
+- 🎬 **動畫跑馬燈** - 首頁展示動畫輪播
 
 ## 技術堆疊
 
 ### 前端
 - React 18 + TypeScript + Vite
-- Leaflet + react-leaflet (地圖)
+- Google Maps API (地圖)
 - Tailwind CSS (樣式)
 - React Query (資料管理)
 - React Router (路由)
@@ -27,6 +33,8 @@
 - PostgreSQL
 - JWT 認證
 - Zod 驗證
+- Groq AI API (客服小精靈)
+- Google Maps Distance Matrix API (路線優化)
 
 ## 專案結構
 
@@ -44,6 +52,8 @@ final-project/
 - Node.js 18+
 - PostgreSQL 14+
 - npm 或 yarn
+- Google Maps API Key
+- Groq API Key (可選，用於AI客服)
 
 ### 1. 安裝依賴
 
@@ -65,6 +75,9 @@ npm install
 DATABASE_URL="postgresql://user:password@localhost:5432/animap?schema=public"
 JWT_SECRET="your-secret-key-change-in-production"
 PORT=3001
+GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
+LLM_API_KEY="your-groq-api-key"
+LLM_API_BASE="https://api.groq.com/openai/v1"
 ```
 
 ### 3. 初始化資料庫
@@ -75,14 +88,23 @@ cd backend
 # 產生 Prisma Client
 npm run prisma:generate
 
-# 執行資料庫遷移
-npm run prisma:migrate
+# 同步資料庫結構
+npx prisma db push
 
 # 載入種子資料
 npm run prisma:seed
 ```
 
-### 4. 啟動開發伺服器
+### 4. 設定前端環境變數
+
+在 `frontend` 目錄下建立 `.env` 檔案：
+
+```env
+VITE_API_URL=http://localhost:3001/api
+VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+```
+
+### 5. 啟動開發伺服器
 
 ```bash
 # 啟動後端 (在 backend 目錄)
@@ -94,22 +116,6 @@ npm run dev
 
 前端將在 `http://localhost:5173` 運行
 後端 API 將在 `http://localhost:3001` 運行
-
-## 環境變數
-
-### 前端 (.env)
-
-```env
-VITE_API_URL=http://localhost:3001/api
-```
-
-### 後端 (.env)
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/animap?schema=public
-JWT_SECRET=your-secret-key-change-in-production
-PORT=3001
-```
 
 ## API 端點
 
@@ -132,13 +138,35 @@ PORT=3001
 - `DELETE /api/favorites/:locationId` - 移除收藏
 - `GET /api/favorites/:locationId/check` - 檢查是否已收藏
 
+### 喜歡的動畫
+- `GET /api/favorite-animes` - 取得使用者喜歡的動畫列表
+- `POST /api/favorite-animes/:animeId` - 新增喜歡的動畫
+- `DELETE /api/favorite-animes/:animeId` - 移除喜歡的動畫
+- `GET /api/favorite-animes/:animeId/check` - 檢查是否已喜歡
+
+### 好友
+- `GET /api/friends` - 取得好友列表
+- `POST /api/friends/request/:receiverId` - 發送好友請求
+- `GET /api/friends/requests` - 取得待處理的好友請求
+- `PUT /api/friends/request/:requestId` - 接受/拒絕好友請求
+- `GET /api/friends/recommendations` - 取得推薦好友（基於共同喜歡的動畫）
+
+### 評分
+- `POST /api/ratings/anime/:id` - 為動畫評分
+- `GET /api/ratings/anime/:id` - 取得動畫評分
+- `POST /api/ratings/location/:id` - 為地點評分
+- `GET /api/ratings/location/:id` - 取得地點評分
+
+### AI客服
+- `POST /api/ai/chat` - 與AI客服小精靈聊天
+
 ## 開發
 
 ### 資料庫遷移
 
 ```bash
 cd backend
-npm run prisma:migrate
+npx prisma db push
 ```
 
 ### 重新載入種子資料
@@ -151,5 +179,3 @@ npm run prisma:seed
 ## 授權
 
 MIT License
-
-
