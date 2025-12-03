@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(cuid())
+  email            String             @unique
+  password         String
+  name             String?
+  avatar           String?            // 頭像 URL
+  bio              String?            // 個人簡介
+  favorites        Favorite[]
+  comments         Comment[]
+  commentLikes     CommentLike[]
+  itineraries      Itinerary[]
+  itineraryLikes   ItineraryLike[]
+  itineraryComments ItineraryComment[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model Anime {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  nameEn      String?    // 英文名稱
+  year        Int?       // 年份
+  genre       String?    // 類型
+  description String?    // 簡介
+  coverImage  String?    // 封面圖 URL
+  locations   Location[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Location {
+  id             String          @id @default(cuid())
+  name           String
+  animeId        String
+  anime          Anime           @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  latitude       Float
+  longitude      Float
+  address        String
+  episode        String?         // 出現集數
+  animeImage     String          // 動畫截圖 URL
+  realImage      String          // 真實照片 URL
+  description    String?         // 描述
+  favorites      Favorite[]
+  comments       Comment[]
+  itineraryItems ItineraryItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  
+  @@unique([userId, locationId]) // 防止重複收藏
+}
+
+model Comment {
+  id          String        @id @default(cuid())
+  locationId  String
+  location    Location      @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String        // 評論內容
+  rating      Int?          // 評分 1-5
+  parentId    String?       // 回覆的父評論 ID
+  parent      Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[]     @relation("CommentReplies")
+  likes       CommentLike[]
+  photos      CommentPhoto[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([commentId, userId])
+}
+
+model CommentPhoto {
+  id        String   @id @default(cuid())
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  url       String   // 照片 URL
+  createdAt DateTime @default(now())
+}
+
+model Itinerary {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String             // 行程名稱
+  description String?            // 行程描述
+  startDate   DateTime?          // 開始日期
+  endDate     DateTime?          // 結束日期
+  transport   String             // 交通方式: walking, public, driving
+  isPublic    Boolean            @default(false) // 是否公開
+  items       ItineraryItem[]
+  likes       ItineraryLike[]
+  comments    ItineraryComment[]
+  viewCount   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model ItineraryItem {
+  id          String     @id @default(cuid())
+  itineraryId String
+  itinerary   Itinerary  @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  locationId  String
+  location    Location   @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  order       Int        // 排序順序（優化後的順序）
+  visitDate   DateTime?  // 預計參訪日期時間
+  duration    Int?       // 預計停留時間（分鐘）
+  notes       String?    // 個人筆記
+  createdAt   DateTime   @default(now())
+}
+
+model ItineraryLike {
+  id          String    @id @default(cuid())
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  
+  @@unique([itineraryId, userId])
+}
+
+model ItineraryComment {
+  id          String    @id @default(cuid())
+  itineraryId String
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  createdAt   DateTime  @default(now())
+}
+
