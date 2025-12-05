@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE Bot - 管理後台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #00C300;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .conversations-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .conversation-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        
+        .conversation-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .conversation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .conversation-id {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+        }
+        
+        .user-id {
+            font-weight: 600;
+            color: #00C300;
+        }
+        
+        .message-preview {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .meta-info {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #00C300;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #00A300;
+        }
+        
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .pagination a {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 4px;
+            background: white;
+            color: #00C300;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .pagination a:hover {
+            background: #00C300;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 LINE Bot 管理後台</h1>
+            <p>查看所有對話記錄</p>
+            <div style="margin-top: 15px;">
+                <button onclick="clearAllConversations()" style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                    🗑️ 清除所有對話（測試用）
+                </button>
+            </div>
+        </header>
+        
+        <div class="search-box">
+            <form method="GET" action="/admin">
+                <input 
+                    type="text" 
+                    name="user_id" 
+                    placeholder="搜尋用戶 ID..." 
+                    value="{{ request.args.get('user_id', '') }}"
+                >
+            </form>
+        </div>
+        
+        <div class="conversations-list">
+            {% if conversations %}
+                {% for conv in conversations %}
+                <div class="conversation-item">
+                    <div class="conversation-header">
+                        <div>
+                            <div class="user-id">用戶 ID: {{ conv.user_id }}</div>
+                            <div class="conversation-id">對話 ID: {{ conv.conversation_id }}</div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="/admin/conversation/{{ conv.conversation_id }}" class="btn">查看詳情</a>
+                            <button onclick="clearUserConversation('{{ conv.user_id }}')" style="background: #ff8800; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                                清除此用戶
+                            </button>
+                        </div>
+                    </div>
+                    <div class="message-preview">
+                        {% if conv.last_message %}
+                            {{ conv.last_message[:100] }}{% if conv.last_message|length > 100 %}...{% endif %}
+                        {% else %}
+                            (無訊息)
+                        {% endif %}
+                    </div>
+                    <div class="meta-info">
+                        <span>訊息數: {{ conv.message_count }}</span>
+                        <span>平台: {{ conv.platform }}</span>
+                        <span>更新時間: {{ conv.updated_at[:19] if conv.updated_at else 'N/A' }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>目前沒有對話記錄</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if conversations %}
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="/admin?page={{ page - 1 }}">上一頁</a>
+            {% endif %}
+            <span>第 {{ page }} 頁</span>
+            {% if conversations|length == 20 %}
+            <a href="/admin?page={{ page + 1 }}">下一頁</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        function clearUserConversation(userId) {
+            if (!confirm(`確定要清除用戶 ${userId} 的對話記錄嗎？\n\n這將刪除該用戶的所有對話，用於重新測試首次對話。`)) {
+                return;
+            }
+            
+            fetch(`/admin/clear-conversation/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || '清除成功！');
+                location.reload();
+            })
+            .catch(error => {
+                alert('清除失敗：' + error);
+            });
+        }
+        
+        function clearAllConversations() {
+            if (!confirm('⚠️ 確定要清除所有對話記錄嗎？\n\n這將刪除所有用戶的所有對話，用於重新測試。')) {
+                return;
+            }
+            
+            if (!confirm('⚠️ 再次確認：你真的要清除所有對話記錄嗎？')) {
+                return;
+            }
+            
+            fetch('/admin/clear-all', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || '清除成功！');
+                location.reload();
+            })
+            .catch(error => {
+                alert('清除失敗：' + error);
+            });
+        }
+    </script>
+</body>
+</html>
+
