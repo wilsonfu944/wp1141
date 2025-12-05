@@ -112,12 +112,36 @@ npm run dev
 
 ### Vercel 部署
 
-1. 将代码推送到 GitHub
-2. 在 Vercel 中导入项目
-3. 设置环境变量
-4. 部署
+Next.js 全栈项目部署到 Vercel 非常简单，前后端都在同一个项目中！
 
-Vercel 会自动检测 Next.js 项目并配置构建。
+**快速部署步骤：**
+
+1. **推送到 GitHub**
+   ```bash
+   git add .
+   git commit -m "准备部署"
+   git push origin main
+   ```
+
+2. **在 Vercel 中导入项目**
+   - 访问 [vercel.com](https://vercel.com)
+   - 使用 GitHub 登录
+   - 点击 "Add New Project"
+   - 选择仓库 `wilsonfu944/wp1141`
+   - **重要：设置 Root Directory 为 `final-project`**
+
+3. **配置环境变量**
+   在 Vercel Dashboard 中添加：
+   - `DATABASE_URL` - MongoDB 连接字符串
+   - `JWT_SECRET` - JWT 密钥
+   - `LLM_API_KEY` - Groq API Key
+   - `GOOGLE_MAPS_API_KEY` - Google Maps API Key
+
+4. **部署**
+   - 点击 "Deploy"
+   - 等待构建完成
+
+详细部署指南请查看 [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md)
 
 ## 注意事项
 
