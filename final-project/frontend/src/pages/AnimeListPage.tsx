@@ -11,10 +11,18 @@ export default function AnimeListPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'year' | 'locations'>('name');
 
-  const { data: animes = [], isLoading } = useQuery<Anime[]>({
+  const { data: animes = [], isLoading, error } = useQuery<Anime[]>({
     queryKey: ['animes'],
     queryFn: () => animesAPI.getAll(),
   });
+
+  // Debug: 打印数据
+  if (animes.length > 0) {
+    console.log('✅ 动画数据加载成功:', animes.length, '部');
+  }
+  if (error) {
+    console.error('❌ 加载动画失败:', error);
+  }
 
   // Filter and sort animes
   const filteredAnimes = animes

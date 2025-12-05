@@ -1,6 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-// ⚠️ 已切换为 MongoDB - 使用 MongoDB Atlas
+// MongoDB 版本的 Prisma Schema
+// 注意：MongoDB 与 PostgreSQL 有一些差异，需要调整
 
 generator client {
   provider = "prisma-client-js"
@@ -30,12 +29,12 @@ model User {
   itineraryComments ItineraryComment[]
   forumPosts       ForumPost[]
   forumReplies     ForumReply[]
-  sentMessages     Message[]          @relation("SentMessages")
-  receivedMessages Message[]          @relation("ReceivedMessages")
-  sentFriendRequests     FriendRequest[]     @relation("SentFriendRequests")
-  receivedFriendRequests FriendRequest[]     @relation("ReceivedFriendRequests")
-  friendsAsUser1  Friendship[]              @relation("User1Friendships")
-  friendsAsUser2  Friendship[]               @relation("User2Friendships")
+  sentMessages     Message[]
+  receivedMessages Message[]
+  sentFriendRequests     FriendRequest[]
+  receivedFriendRequests FriendRequest[]
+  friendsAsUser1  Friendship[]
+  friendsAsUser2  Friendship[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 }
@@ -97,7 +96,7 @@ model Comment {
   content     String
   rating      Int?
   parentId    String?       @db.ObjectId
-  parent      Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent      Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
   replies     Comment[]     @relation("CommentReplies")
   likes       CommentLike[]
   photos      CommentPhoto[]
@@ -111,9 +110,9 @@ model Comment {
 model CommentLike {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   commentId String   @db.ObjectId
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comment   Comment  @relation(fields: [commentId], references: [id])
   userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   
   @@unique([commentId, userId])
@@ -124,7 +123,7 @@ model CommentLike {
 model CommentPhoto {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   commentId String   @db.ObjectId
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comment   Comment  @relation(fields: [commentId], references: [id])
   url       String
   createdAt DateTime @default(now())
   
@@ -220,7 +219,7 @@ model ForumReply {
   user        User       @relation(fields: [userId], references: [id])
   content     String
   parentId    String?    @db.ObjectId
-  parent      ForumReply? @relation("ReplyReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent      ForumReply? @relation("ReplyReplies", fields: [parentId], references: [id])
   replies     ForumReply[] @relation("ReplyReplies")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -315,3 +314,6 @@ model Message {
   @@index([receiverId])
   @@index([itineraryId])
 }
+
+
+
