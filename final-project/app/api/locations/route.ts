@@ -45,10 +45,10 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(locations);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get locations error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error.message || 'Internal server error' },
       { status: 500 }
     );
   }

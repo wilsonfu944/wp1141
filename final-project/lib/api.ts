@@ -9,6 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 8000, // 8 seconds timeout (Vercel 函数超时是 10s，留点缓冲)
 });
 
 // 請求攔截器：自動添加 token

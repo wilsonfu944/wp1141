@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(animes);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get animes error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error.message || 'Internal server error' },
       { status: 500 }
     );
   }
