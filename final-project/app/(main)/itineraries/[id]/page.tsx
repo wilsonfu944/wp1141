@@ -22,8 +22,10 @@ export default function ItineraryDetailPage({ params }: { params: Promise<{ id: 
     retry: 1,
   });
 
+  const isLiked = itinerary?.likes?.some((like) => like.userId === user?.id) || false;
+
   const likeMutation = useMutation({
-    mutationFn: () => itinerary?.isLiked 
+    mutationFn: () => isLiked 
       ? itinerariesAPI.unlike(id)
       : itinerariesAPI.like(id),
     onSuccess: () => {
@@ -106,12 +108,12 @@ export default function ItineraryDetailPage({ params }: { params: Promise<{ id: 
                 <button
                   onClick={() => likeMutation.mutate()}
                   className={`p-2 rounded-lg transition-colors ${
-                    itinerary.isLiked
+                    isLiked
                       ? 'bg-pink-500 text-white'
                       : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                   }`}
                 >
-                  <Heart className={`w-5 h-5 ${itinerary.isLiked ? 'fill-current' : ''}`} />
+                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                 </button>
               )}
               {isAuthenticated && !isOwner && (

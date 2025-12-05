@@ -10,7 +10,8 @@ export function QueryErrorHandler() {
   useEffect(() => {
     // 监听查询错误
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event?.type === 'error') {
+      // 检查查询是否有错误状态
+      if (event?.query?.state?.error) {
         const query = event.query;
         const error = query.state.error as any;
         
