@@ -40,7 +40,7 @@ const mapOptions = {
 };
 
 export default function MapContainer({ locations, onLocationClick, selectedAnimeId }: MapContainerProps) {
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY || '';
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   // Use useLoadScript hook instead of LoadScript component for better remount handling

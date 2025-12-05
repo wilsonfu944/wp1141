@@ -20,7 +20,7 @@ export default function RatingDisplay({
   showText = true,
 }: RatingDisplayProps) {
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const sizeClasses = {
@@ -52,7 +52,7 @@ export default function RatingDisplay({
 
   const handleStarClick = (value: number) => {
     if (!isAuthenticated) {
-      navigate('/login');
+      router.push('/login');
       return;
     }
     rateMutation.mutate(value);
