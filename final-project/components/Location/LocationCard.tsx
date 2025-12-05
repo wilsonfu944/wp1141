@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
-import type { Location } from '../../types';
+'use client';
+import Link from 'next/link';
+import type { Location } from '@/types';
 import { MapPin, ExternalLink } from 'lucide-react';
 import RatingDisplay from '../Rating/RatingDisplay';
 
@@ -10,7 +11,7 @@ interface LocationCardProps {
 export default function LocationCard({ location }: LocationCardProps) {
   return (
     <div className="bg-slate-800 rounded-lg overflow-hidden hover:scale-[1.02] transition-transform">
-      <Link to={`/locations/${location.id}`}>
+      <Link href={`/locations/${location.id}`}>
         <div className="aspect-video bg-slate-700 relative overflow-hidden">
           <img
             src={location.realImage}

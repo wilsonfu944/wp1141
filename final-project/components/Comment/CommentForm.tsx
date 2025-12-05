@@ -1,9 +1,10 @@
+'use client';
 import { useState } from 'react';
 import { Send } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import RatingStars from '../Rating/RatingStars';
-import { commentsAPI } from '../../services/api';
-import type { Comment } from '../../types';
+import { commentsAPI } from '@/lib/api';
+import type { Comment } from '@/types';
 
 interface CommentFormProps {
   locationId: string;

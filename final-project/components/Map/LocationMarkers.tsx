@@ -1,6 +1,7 @@
+'use client';
 import { useMemo, useState } from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
-import type { google } from '@react-google-maps/api';
+// // Google Maps types are available globally
 
 interface Location {
   id: string;
@@ -52,7 +53,7 @@ export default function LocationMarkers({ locations, onLocationClick, selectedAn
   return (
     <>
       {selectedLocations.map((location) => {
-        const isSelected = selectedAnimeId && location.animeId === selectedAnimeId;
+        const isSelected = !!(selectedAnimeId && location.animeId === selectedAnimeId);
         return (
           <Marker
             key={location.id}

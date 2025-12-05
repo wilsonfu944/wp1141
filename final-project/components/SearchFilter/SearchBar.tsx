@@ -1,6 +1,7 @@
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
-import type { Anime } from '../../types';
+import type { Anime } from '@/types';
 
 interface SearchBarProps {
   animes: Anime[];

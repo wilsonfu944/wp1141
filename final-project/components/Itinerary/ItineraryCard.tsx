@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+'use client';
+import Link from 'next/link';
 import { MapPin, Clock, Heart, Eye, Calendar, Trash2 } from 'lucide-react';
-import type { Itinerary } from '../../types';
+import type { Itinerary } from '@/types';
 
 interface ItineraryCardProps {
   itinerary: Itinerary;
@@ -22,7 +23,7 @@ export default function ItineraryCard({ itinerary, showActions = false, onDelete
 
   return (
     <Link
-      to={`/itineraries/${itinerary.id}`}
+      href={`/itineraries/${itinerary.id}`}
       className="group bg-slate-800 rounded-lg overflow-hidden hover:scale-[1.02] transition-transform border border-slate-700 hover:border-pink-500"
     >
       {/* Preview Images */}

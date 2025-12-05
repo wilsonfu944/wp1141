@@ -1,3 +1,4 @@
+'use client';
 export default function Footer() {
   return (
     <footer className="bg-slate-800/90 backdrop-blur-lg border-t border-slate-700 mt-auto">

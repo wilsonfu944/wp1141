@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { Calendar, Car, Train, Footprints, Lock, Globe } from 'lucide-react';
 

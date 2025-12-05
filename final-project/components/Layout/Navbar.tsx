@@ -1,13 +1,15 @@
+'use client';
 import { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link'
+import { usePathname } from 'next/navigation';
 import { Map, List, Home, User, LogIn, Heart, Route as RouteIcon, MessageSquare, ChevronDown, Users } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { messagesAPI } from '../../services/api';
+import { messagesAPI } from '@/lib/api';
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
-  const location = useLocation();
+  const pathname = usePathname();
   const [isItineraryMenuOpen, setIsItineraryMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -18,7 +20,7 @@ export default function Navbar() {
     refetchInterval: 10000,
   });
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   // 關閉下拉菜單當點擊外部
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/home" className="flex items-center gap-2">
+          <Link href="/home" className="flex items-center gap-2">
             <span className="text-2xl font-bold text-pink-500">AniMap</span>
             <span className="text-sm text-slate-400 hidden sm:inline">動漫聖地巡禮</span>
           </Link>
@@ -47,7 +49,7 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="flex items-center gap-1 md:gap-4">
             <Link
-              to="/home"
+              href="/home"
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/home')
                   ? 'bg-pink-500 text-white'
@@ -59,7 +61,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              to="/animes"
+              href="/animes"
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/animes')
                   ? 'bg-pink-500 text-white'
@@ -71,7 +73,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              to="/map"
+              href="/map"
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                 isActive('/map')
                   ? 'bg-pink-500 text-white'
@@ -87,9 +89,9 @@ export default function Navbar() {
               <button
                 onClick={() => setIsItineraryMenuOpen(!isItineraryMenuOpen)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  location.pathname.includes('/explore/itineraries') || 
-                  location.pathname.includes('/itineraries/') ||
-                  location.pathname.includes('/profile/itineraries')
+                  pathname.includes('/explore/itineraries') || 
+                  pathname.includes('/itineraries/') ||
+                  pathname.includes('/profile/itineraries')
                     ? 'bg-pink-500 text-white'
                     : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`}
@@ -102,10 +104,10 @@ export default function Navbar() {
               {isItineraryMenuOpen && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden z-50">
                   <Link
-                    to="/profile/itineraries"
+                    href="/profile/itineraries"
                     onClick={() => setIsItineraryMenuOpen(false)}
                     className={`block px-4 py-3 text-sm transition-colors ${
-                      location.pathname.includes('/profile/itineraries')
+                      pathname.includes('/profile/itineraries')
                         ? 'bg-pink-500 text-white'
                         : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     }`}
@@ -113,11 +115,11 @@ export default function Navbar() {
                     我的行程
                   </Link>
                   <Link
-                    to="/explore/itineraries"
+                    href="/explore/itineraries"
                     onClick={() => setIsItineraryMenuOpen(false)}
                     className={`block px-4 py-3 text-sm transition-colors ${
-                      location.pathname.includes('/explore/itineraries') || 
-                      (location.pathname.includes('/itineraries/') && !location.pathname.includes('/profile/'))
+                      pathname.includes('/explore/itineraries') || 
+                      (pathname.includes('/itineraries/') && !pathname.includes('/profile/'))
                         ? 'bg-pink-500 text-white'
                         : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     }`}
@@ -129,9 +131,9 @@ export default function Navbar() {
             </div>
 
             <Link
-              to="/forum"
+              href="/forum"
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                location.pathname.includes('/forum')
+                pathname.includes('/forum')
                   ? 'bg-pink-500 text-white'
                   : 'text-slate-300 hover:bg-slate-700 hover:text-white'
               }`}
@@ -143,9 +145,9 @@ export default function Navbar() {
             {isAuthenticated && (
               <>
                 <Link
-                  to="/friends"
+                  href="/friends"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                    location.pathname.includes('/friends')
+                    pathname.includes('/friends')
                       ? 'bg-pink-500 text-white'
                       : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                   }`}
@@ -154,9 +156,9 @@ export default function Navbar() {
                   <span className="hidden md:inline">好友</span>
                 </Link>
                 <Link
-                  to="/messages"
+                  href="/messages"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors relative ${
-                    location.pathname.includes('/messages')
+                    pathname.includes('/messages')
                       ? 'bg-pink-500 text-white'
                       : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                   }`}
@@ -174,7 +176,7 @@ export default function Navbar() {
 
             {isAuthenticated ? (
               <Link
-                to="/profile"
+                href="/profile"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                   isActive('/profile')
                     ? 'bg-pink-500 text-white'
@@ -186,7 +188,7 @@ export default function Navbar() {
               </Link>
             ) : (
               <Link
-                to="/login"
+                href="/login"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
               >
                 <LogIn className="w-5 h-5" />

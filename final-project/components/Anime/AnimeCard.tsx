@@ -1,5 +1,7 @@
-import { Link } from 'react-router-dom';
-import type { Anime } from '../../types';
+'use client';
+
+import Link from 'next/link';
+import type { Anime } from '@/types';
 import { MapPin } from 'lucide-react';
 import RatingDisplay from '../Rating/RatingDisplay';
 
@@ -10,7 +12,7 @@ interface AnimeCardProps {
 export default function AnimeCard({ anime }: AnimeCardProps) {
   return (
     <Link
-      to={`/animes/${anime.id}`}
+      href={`/animes/${anime.id}`}
       className="group bg-slate-800 rounded-lg overflow-hidden hover:scale-105 transition-transform"
     >
       <div className="aspect-[2/3] bg-slate-700 relative overflow-hidden">

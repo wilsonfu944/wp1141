@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+'use client';
+import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
-import { useItineraryCart } from '../../context/ItineraryCartContext';
+import { useItineraryCart } from '@/context/ItineraryCartContext';
 
 export default function CartButton() {
   const { totalItems } = useItineraryCart();
@@ -9,7 +10,7 @@ export default function CartButton() {
 
   return (
     <Link
-      to="/plan"
+      href="/plan"
       className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-6 py-4 bg-pink-500 hover:bg-pink-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 group"
     >
       <div className="relative">

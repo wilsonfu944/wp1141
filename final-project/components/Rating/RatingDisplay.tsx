@@ -1,9 +1,10 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
-import { ratingsAPI } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { ratingsAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface RatingDisplayProps {
   type: 'anime' | 'location';

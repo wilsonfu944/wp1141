@@ -1,3 +1,4 @@
+'use client';
 import ReactCompareImage from 'react-compare-image';
 
 interface ImageSliderProps {

@@ -1,6 +1,7 @@
+'use client';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { GoogleMap, useLoadScript } from '@react-google-maps/api';
-import type { google } from '@react-google-maps/api';
+// Google Maps types are available globally
 import LocationMarkers from './LocationMarkers';
 
 interface MapContainerProps {

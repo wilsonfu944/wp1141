@@ -1,3 +1,4 @@
+'use client';
 import { Filter } from 'lucide-react';
 
 interface RegionFilterProps {

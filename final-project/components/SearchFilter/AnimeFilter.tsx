@@ -1,4 +1,5 @@
-import type { Anime } from '../../types';
+'use client';
+import type { Anime } from '@/types';
 import SearchBar from './SearchBar';
 import RegionFilter from './RegionFilter';
 

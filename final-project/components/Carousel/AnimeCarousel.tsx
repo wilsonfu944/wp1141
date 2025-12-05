@@ -1,7 +1,8 @@
+'use client';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Anime } from '../../types';
+import type { Anime } from '@/types';
 
 interface AnimeCarouselProps {
   animes: Anime[];
@@ -115,7 +116,7 @@ export default function AnimeCarousel({ animes, autoPlayInterval = 5000 }: Anime
               </span>
             </div>
             <Link
-              to={`/animes/${anime.id}`}
+              href={`/animes/${anime.id}`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors shadow-lg"
             >
               查看詳情

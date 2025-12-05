@@ -1,8 +1,9 @@
+'use client';
 import { useState } from 'react';
 import { Heart, Reply, Edit, Trash2, MoreVertical } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { commentsAPI } from '../../services/api';
-import type { Comment } from '../../types';
+import { useAuth } from '@/context/AuthContext';
+import { commentsAPI } from '@/lib/api';
+import type { Comment } from '@/types';
 import RatingStars from '../Rating/RatingStars';
 import CommentForm from './CommentForm';
 

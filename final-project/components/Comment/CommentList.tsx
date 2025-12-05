@@ -1,8 +1,9 @@
+'use client';
 import { useState } from 'react';
 import { MessageSquare, TrendingUp, Star, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { commentsAPI } from '../../services/api';
-import type { Comment } from '../../types';
+import { commentsAPI } from '@/lib/api';
+import type { Comment } from '@/types';
 import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
 

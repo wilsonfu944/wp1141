@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 'use client';
 
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Location } from '@/types';
 
 interface CartItem {

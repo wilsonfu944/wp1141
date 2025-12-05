@@ -1,7 +1,8 @@
+'use client';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
-import { itinerariesAPI } from '../../services/api';
+import { itinerariesAPI } from '@/lib/api';
 
 interface ItineraryCommentFormProps {
   itineraryId: string;

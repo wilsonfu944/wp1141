@@ -125,7 +125,7 @@ export default function LocationDetailPanel({ location, onClose }: LocationDetai
         {/* Actions */}
         <div className="space-y-3">
           <Link
-            to={`/locations/${location.id}`}
+            href={`/locations/${location.id}`}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
           >
             查看完整詳情

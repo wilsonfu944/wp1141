@@ -1,3 +1,4 @@
+'use client';
 import {
   DndContext,
   closestCenter,
@@ -16,7 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2, MapPin } from 'lucide-react';
-import type { CartItem } from '../../context/ItineraryCartContext';
+import type { CartItem } from '@/context/ItineraryCartContext';
 
 interface SortableItemProps {
   item: CartItem;

@@ -1,6 +1,7 @@
+'use client';
 import { MapPin, Clock, Car, Train, Footprints, ArrowDown } from 'lucide-react';
-import type { ItineraryItem } from '../../types';
-import { Link } from 'react-router-dom';
+import type { ItineraryItem } from '@/types';
+import Link from 'next/link';
 
 interface TimelineProps {
   items: ItineraryItem[];
@@ -78,14 +79,14 @@ export default function Timeline({ items, transport, startDate, segments }: Time
                         )}
                       </div>
                       <Link
-                        to={`/locations/${item.location.id}`}
+                        href={`/locations/${item.location.id}`}
                         className="text-xl font-bold text-white hover:text-pink-500 transition-colors block mb-2"
                       >
                         {item.location.name}
                       </Link>
                       {item.location.anime && (
                         <Link
-                          to={`/animes/${item.location.anime.id}`}
+                          href={`/animes/${item.location.anime.id}`}
                           className="inline-block px-2 py-1 bg-pink-500/20 text-pink-300 rounded text-sm mb-2 hover:bg-pink-500/30 transition-colors"
                         >
                           {item.location.anime.name}
