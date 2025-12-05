@@ -11,7 +11,7 @@
 ### 1. Google OAuth ✅
 ```
 Client ID: 140341565879-0nb1d8fkvqq266k23po884jeqvktc14o...
-Client Secret: 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
+Client Secret: YOUR_GOOGLE_CLIENT_SECRET
 狀態: ✅ 已設置且可用
 ```
 
