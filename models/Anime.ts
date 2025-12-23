@@ -1,0 +1,77 @@
+import mongoose, { Schema, Document, Model } from 'mongoose';
+
+export interface IAnime extends Document {
+  title: string;
+  titleJP?: string;
+  description: string;
+  coverImage: string;
+  rating: number;
+  releaseDate: Date;
+  genres: string[];
+  studio?: string;
+  episodes?: number;
+  status: 'ongoing' | 'completed' | 'upcoming';
+  locations: mongoose.Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const AnimeSchema: Schema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    titleJP: {
+      type: String,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    coverImage: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    releaseDate: {
+      type: Date,
+      required: true,
+    },
+    genres: [
+      {
+        type: String,
+      },
+    ],
+    studio: {
+      type: String,
+    },
+    episodes: {
+      type: Number,
+    },
+    status: {
+      type: String,
+      enum: ['ongoing', 'completed', 'upcoming'],
+      default: 'completed',
+    },
+    locations: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Location',
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Anime: Model<IAnime> = mongoose.models.Anime || mongoose.model<IAnime>('Anime', AnimeSchema);
+
+export default Anime;
+
