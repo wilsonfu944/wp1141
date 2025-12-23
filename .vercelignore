@@ -1,0 +1,13 @@
+# 忽略所有其他作业目录，只构建 final-project
+hw1/
+hw2/
+hw3/
+hw4/
+hw5/
+hw6/
+hw7/
+README.md
+
+# 只保留 final-project 目录
+!final-project/
+

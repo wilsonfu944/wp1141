@@ -1,0 +1,54 @@
+# Vercel 環境變數設置
+# 在 Vercel Dashboard → Settings → Environment Variables 中逐一添加
+
+# === 資料庫 ===
+# 名稱: DATABASE_URL
+# 值: (使用 Vercel Postgres 的 POSTGRES_PRISMA_URL 或其他資料庫連接字串)
+DATABASE_URL=
+
+# === NextAuth ===
+# 名稱: NEXTAUTH_SECRET
+# 值: (運行 openssl rand -base64 32 生成)
+NEXTAUTH_SECRET=
+
+# 名稱: NEXTAUTH_URL
+# 值: https://your-app.vercel.app (部署後的實際 URL)
+NEXTAUTH_URL=
+
+# === Google OAuth ===
+# 名稱: GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+
+# 名稱: GOOGLE_CLIENT_SECRET
+GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
+
+# === GitHub OAuth ===
+# 名稱: GITHUB_ID
+GITHUB_ID=Ov23liuyObQuH659LTdR
+
+# 名稱: GITHUB_SECRET
+GITHUB_SECRET=77592416b4bee9ca40c9d49403ec884a3f3c50e4
+
+# === Pusher ===
+# 名稱: NEXT_PUBLIC_PUSHER_KEY
+NEXT_PUBLIC_PUSHER_KEY=d7b884923205cc208fc1
+
+# 名稱: NEXT_PUBLIC_PUSHER_CLUSTER
+NEXT_PUBLIC_PUSHER_CLUSTER=ap3
+
+# 名稱: PUSHER_APP_ID
+PUSHER_APP_ID=2074825
+
+# 名稱: PUSHER_SECRET
+PUSHER_SECRET=8efb85a536e662696284
+
+# ============================================
+# 總計需要設置 11 個環境變數
+# ============================================
+
+# 部署後別忘記：
+# 1. 更新 NEXTAUTH_URL 為實際的 Vercel URL
+# 2. 更新 Google OAuth 回調 URL
+# 3. 更新 GitHub OAuth 回調 URL
+# 4. 運行資料庫遷移: npx prisma migrate deploy
+

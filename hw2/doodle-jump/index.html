@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Jump - Play Now!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 600px;
+            height: 100vh;
+            position: relative;
+            background: url('src/assets/background.jpeg') center/cover no-repeat;
+            margin: 0 auto;
+            border: 3px solid #333;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            z-index: 5;
+            transition: all 0.1s ease;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .platform {
+            position: absolute;
+            background: #8B4513;
+            border-radius: 5px;
+            z-index: 3;
+            width: 80px;
+            height: 15px;
+        }
+
+        .platform.breakable {
+            background: #2196F3;
+            border: 2px solid #1976D2;
+            opacity: 0.8;
+        }
+
+        .monster {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            z-index: 4;
+            background-image: url('src/assets/monster.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .player.flipped {
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+        .menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 20;
+        }
+
+        .menu h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 20;
+            display: none;
+        }
+
+        .game-over h2 {
+            color: #F44336;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .character-select {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 20;
+            display: none;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .character-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .character-card.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .character-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .character-name {
+            font-weight: bold;
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* Leaderboard Styles */
+        .leaderboard {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 20;
+            display: none;
+            min-width: 500px;
+        }
+
+        .leaderboard h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard-item.first {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+        }
+
+        .leaderboard-item.second {
+            background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+            color: white;
+        }
+
+        .leaderboard-item.third {
+            background: linear-gradient(45deg, #CD7F32, #B8860B);
+            color: white;
+        }
+
+        .rank {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .player-details {
+            text-align: left;
+        }
+
+        .player-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .player-character {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .player-score {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .no-records {
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <div class="game-ui" id="score">Score: 0</div>
+        <div class="player" id="player"></div>
+        <div class="menu" id="menu">
+            <h1>Doodle Jump</h1>
+            <button class="btn" onclick="startGame()">Start Game</button>
+            <button class="btn" onclick="showCharacterSelect()">Character Select</button>
+            <button class="btn" onclick="showLeaderboard()">Leaderboard</button>
+            <button class="btn" onclick="showInstructions()">How to Play</button>
+        </div>
+        <div class="character-select" id="characterSelect">
+            <h2>Choose Your Character</h2>
+            <div class="character-grid" id="characterGrid">
+                <!-- Characters will be generated by JavaScript -->
+            </div>
+            <button class="btn" onclick="hideCharacterSelect()">Back to Menu</button>
+        </div>
+        <div class="leaderboard" id="leaderboard">
+            <h2>🏆 Leaderboard</h2>
+            <div id="leaderboardList">
+                <!-- Leaderboard items will be generated by JavaScript -->
+            </div>
+            <button class="btn" onclick="hideLeaderboard()">Back to Menu</button>
+        </div>
+        <div class="game-over" id="gameOver">
+            <h2>Game Over!</h2>
+            <p id="finalScore">Final Score: 0</p>
+            <div class="game-over-buttons">
+                <button class="btn btn-primary" onclick="restartGame()">Play Again</button>
+                <button class="btn btn-secondary" onclick="backToMainMenu()">Main Menu</button>
+            </div>
+        </div>
+        <div class="instructions" id="instructions">
+            Use ← → keys to move • Press ESC to pause
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            running: false,
+            score: 0,
+            highScore: 0,
+            player: {
+                x: 0,
+                y: 0,
+                velocityX: 0,
+                velocityY: 0,
+                width: 50,
+                height: 50,
+                flipped: false
+            },
+            platforms: [],
+            monsters: [],
+            cameraY: 0,
+            keys: {},
+            selectedCharacter: null,
+            lastMonsterScore: 0 // Track last score when monster was generated
+        };
+
+        // Leaderboard data (stored in localStorage)
+        let leaderboard = JSON.parse(localStorage.getItem('doodleJumpLeaderboard') || '[]');
+
+
+        const characters = [
+            { 
+                id: 1, 
+                name: 'Doodle', 
+                color: '#4CAF50', 
+                emoji: '🟢', 
+                image: 'src/assets/doodle.png',
+                description: '經典的綠色角色，平衡的跳躍能力，適合新手玩家。'
+            },
+            { 
+                id: 2, 
+                name: 'Mario', 
+                color: '#F44336', 
+                emoji: '🔴', 
+                image: 'src/assets/mario.jpeg',
+                description: '水管工英雄，擁有超強的跳躍力和冒險精神。'
+            },
+            { 
+                id: 3, 
+                name: 'Cat', 
+                color: '#FF9800', 
+                emoji: '🐱', 
+                image: 'src/assets/cat.png',
+                description: '靈活的橘色小貓，動作敏捷，適合快速反應的玩家。'
+            },
+            { 
+                id: 4, 
+                name: 'Faker', 
+                color: '#9C27B0', 
+                emoji: '🎮', 
+                image: 'src/assets/faker.png',
+                description: '電競傳奇選手，擁有精準的操作和冷靜的判斷力。'
+            },
+            { 
+                id: 5, 
+                name: 'Sonic', 
+                color: '#2196F3', 
+                emoji: '💨', 
+                image: 'src/assets/sonic.png',
+                description: '音速刺蝟，速度極快，適合追求極限的玩家。'
+            }
+        ];
+
+        const GRAVITY = 0.5;
+        const JUMP_FORCE = -16;
+        const MOVE_SPEED = 8;
+        const PLATFORM_WIDTH = 80;
+        const PLATFORM_HEIGHT = 15;
+
+
+        function initGame() {
+            gameState.platforms = [];
+            gameState.monsters = [];
+            gameState.lastMonsterScore = 0; // Reset monster generation counter
+            
+            // Create initial platforms
+            for (let i = 0; i < 10; i++) {
+                gameState.platforms.push({
+                    x: Math.random() * (600 - PLATFORM_WIDTH),
+                    y: window.innerHeight - (i * 80) - 100,
+                    width: PLATFORM_WIDTH,
+                    height: PLATFORM_HEIGHT
+                });
+            }
+            
+            // Find the highest platform and place player on it
+            const highestPlatform = Math.min(...gameState.platforms.map(p => p.y));
+            const platformForPlayer = gameState.platforms.find(p => p.y === highestPlatform);
+            
+            gameState.player = {
+                x: platformForPlayer ? platformForPlayer.x + (platformForPlayer.width / 2) - 25 : 300, // Center on platform
+                y: highestPlatform - 25, // Center of player on platform top
+                velocityX: 0,
+                velocityY: 0,
+                width: 50,
+                height: 50,
+                flipped: false
+            };
+            
+            // Ensure flipped state is reset
+            gameState.player.flipped = false;
+            
+            gameState.cameraY = 0;
+            gameState.score = 0;
+            // Don't reset high score, keep it persistent
+        }
+
+        function startGame() {
+            initGame();
+            gameState.running = true;
+            gameState.player.flipped = false; // Reset flipped state
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'none';
+            gameLoop();
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        function backToMainMenu() {
+            gameState.running = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+        }
+
+        function showCharacterSelect() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('characterSelect').style.display = 'block';
+            generateCharacterGrid();
+        }
+
+        function hideCharacterSelect() {
+            document.getElementById('characterSelect').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+        }
+
+        function generateCharacterGrid() {
+            const grid = document.getElementById('characterGrid');
+            grid.innerHTML = '';
+            
+            characters.forEach(character => {
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                if (gameState.selectedCharacter && gameState.selectedCharacter.id === character.id) {
+                    card.classList.add('selected');
+                }
+                card.onclick = () => selectCharacter(character);
+                
+                if (character.image) {
+                    card.innerHTML = `
+                        <div class="character-avatar" style="background-color: ${character.color}; background-image: url('${character.image}'); background-size: contain; background-repeat: no-repeat; background-position: center;">
+                        </div>
+                        <div class="character-name">${character.name}</div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="character-avatar" style="background-color: ${character.color}">
+                            ${character.emoji}
+                        </div>
+                        <div class="character-name">${character.name}</div>
+                    `;
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function selectCharacter(character) {
+            gameState.selectedCharacter = character;
+            gameState.player.flipped = false; // Reset flipped state when selecting character
+            const playerElement = document.getElementById('player');
+            
+            if (character.image) {
+                playerElement.style.backgroundImage = `url('${character.image}')`;
+                playerElement.style.backgroundSize = 'contain';
+                playerElement.style.backgroundRepeat = 'no-repeat';
+                playerElement.style.backgroundPosition = 'center';
+                playerElement.style.backgroundColor = 'transparent';
+            } else {
+                playerElement.style.backgroundImage = 'none';
+                playerElement.style.backgroundColor = character.color;
+            }
+            
+            generateCharacterGrid();
+            showCharacterDescription(character);
+        }
+
+        function showCharacterDescription(character) {
+            // Remove existing description if any
+            const existingDesc = document.getElementById('characterDescription');
+            if (existingDesc) {
+                existingDesc.remove();
+            }
+
+            // Create description element
+            const descriptionDiv = document.createElement('div');
+            descriptionDiv.id = 'characterDescription';
+            descriptionDiv.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 255, 255, 0.95);
+                padding: 20px;
+                border-radius: 15px;
+                border: 3px solid ${character.color};
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                max-width: 400px;
+                z-index: 1000;
+                animation: fadeInUp 0.5s ease-out;
+            `;
+
+            descriptionDiv.innerHTML = `
+                <h3 style="color: ${character.color}; margin-bottom: 15px; font-size: 1.5rem;">
+                    🎮 已選擇: ${character.name}
+                </h3>
+                <p style="font-size: 16px; line-height: 1.6; color: #555; margin: 0;">
+                    ${character.description}
+                </p>
+                <button onclick="hideCharacterDescription()" style="
+                    margin-top: 15px;
+                    padding: 8px 20px;
+                    background: ${character.color};
+                    color: white;
+                    border: none;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">確定</button>
+            `;
+
+            // Add animation keyframes if not exists
+            if (!document.getElementById('fadeInUpAnimation')) {
+                const style = document.createElement('style');
+                style.id = 'fadeInUpAnimation';
+                style.textContent = `
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translate(-50%, -40%);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translate(-50%, -50%);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(descriptionDiv);
+        }
+
+        function hideCharacterDescription() {
+            const description = document.getElementById('characterDescription');
+            if (description) {
+                description.remove();
+            }
+        }
+
+        function showLeaderboard() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('leaderboard').style.display = 'block';
+            generateLeaderboard();
+        }
+
+        function hideLeaderboard() {
+            document.getElementById('leaderboard').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+        }
+
+        function generateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<div class="no-records">No records yet. Be the first to play!</div>';
+                return;
+            }
+
+            // Sort by score (highest first) and take top 3
+            const topPlayers = leaderboard
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3);
+
+            topPlayers.forEach((player, index) => {
+                const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : 'third';
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                
+                const leaderboardItem = document.createElement('div');
+                leaderboardItem.className = `leaderboard-item ${rankClass}`;
+                
+                const character = characters.find(c => c.id === player.characterId);
+                const characterName = character ? character.name : 'Unknown';
+                
+                // Create avatar with character image or emoji
+                let avatarContent = '';
+                if (character && character.image) {
+                    avatarContent = `<div class="player-avatar" style="background-color: ${character.color}; background-image: url('${character.image}'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>`;
+                } else {
+                    const characterEmoji = character ? (character.emoji || '🎮') : '🎮';
+                    avatarContent = `<div class="player-avatar" style="background-color: ${character ? character.color : '#666'}">${characterEmoji}</div>`;
+                }
+                
+                leaderboardItem.innerHTML = `
+                    <div class="rank">${rankEmoji}</div>
+                    <div class="player-info">
+                        ${avatarContent}
+                        <div class="player-details">
+                            <div class="player-name">${player.playerName}</div>
+                            <div class="player-character">${characterName}</div>
+                        </div>
+                    </div>
+                    <div class="player-score">${player.score}</div>
+                `;
+                
+                leaderboardList.appendChild(leaderboardItem);
+            });
+        }
+
+        function addToLeaderboard(score, characterId) {
+            const playerName = prompt('Enter your name for the leaderboard:') || 'Anonymous';
+            
+            const newRecord = {
+                playerName: playerName,
+                score: score,
+                characterId: characterId,
+                date: new Date().toLocaleDateString()
+            };
+            
+            leaderboard.push(newRecord);
+            
+            // Keep only top 10 records
+            leaderboard = leaderboard
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
+            
+            // Save to localStorage
+            localStorage.setItem('doodleJumpLeaderboard', JSON.stringify(leaderboard));
+        }
+
+        function showInstructions() {
+            alert(`How to Play Doodle Jump:
+
+🎮 Game Goal:
+Control your character to jump higher and higher by landing on platforms.
+
+🎯 Controls:
+- Use ← → arrow keys to move left and right
+- Character wraps around screen edges
+- Land on platforms to jump higher
+- Avoid falling off the bottom
+
+🏆 Scoring:
+- Score increases as you go higher
+- Try to beat your high score!
+
+Press OK to start playing!`);
+        }
+
+        function checkCollision(player, platform) {
+            // Check if player center is above platform and falling down
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+            const platformTop = platform.y;
+            const platformBottom = platform.y + platform.height;
+            
+            // Player must be falling and center must be within platform bounds
+            // Add more tolerance for better edge detection, especially for right side
+            const tolerance = 12;
+            const rightTolerance = 15; // Extra tolerance for right side
+            
+            return (
+                player.velocityY > 0 && // Must be falling
+                playerCenterY >= platformTop - tolerance && // Player center is at or below platform top
+                playerCenterY <= platformBottom + tolerance && // Player center is not too far below platform
+                playerCenterX >= platform.x - tolerance && // Player center is within platform width (with tolerance)
+                playerCenterX <= platform.x + platform.width + rightTolerance // Extra tolerance for right side
+            );
+        }
+
+        function checkMonsterCollision(player, monster) {
+            // Check if player collides with monster
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+            const monsterCenterX = monster.x + monster.width / 2;
+            const monsterCenterY = monster.y + monster.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(playerCenterX - monsterCenterX, 2) + 
+                Math.pow(playerCenterY - monsterCenterY, 2)
+            );
+            
+            return distance < 30; // Collision radius
+        }
+
+        function generatePlatforms() {
+            const highestPlatform = Math.min(...gameState.platforms.map(p => p.y));
+            
+            if (gameState.player.y < highestPlatform + 200) {
+                // Determine platform density based on score
+                let platformCount = 3; // Default number of platforms
+                let platformSpacing = 100; // Default spacing
+                
+                if (gameState.score >= 1000) {
+                    // Make platforms much sparser after 1000 points
+                    platformCount = 2; // Reduce to 2 platforms for more challenge
+                    platformSpacing = 180; // Increase spacing significantly
+                }
+                
+                for (let i = 0; i < platformCount; i++) {
+                    let isBreakable = false;
+                    if (gameState.score >= 2500) {
+                        isBreakable = true; // All platforms are breakable at 2500+
+                    } else if (gameState.score >= 1500) {
+                        isBreakable = Math.random() < 0.7; // 70% chance for breakable platforms
+                    }
+                    gameState.platforms.push({
+                        x: Math.random() * (600 - PLATFORM_WIDTH),
+                        y: highestPlatform - (Math.random() * platformSpacing + 50),
+                        width: PLATFORM_WIDTH,
+                        height: PLATFORM_HEIGHT,
+                        breakable: isBreakable
+                    });
+                }
+            }
+            
+            // Remove platforms that are too far below
+            gameState.platforms = gameState.platforms.filter(platform => 
+                platform.y < gameState.player.y + 500
+            );
+        }
+
+        function generateMonsters() {
+            // Only generate monsters after 2000 points
+            if (gameState.score >= 2000) {
+                // Generate a monster every 100 points
+                const monsterInterval = 100;
+                const currentMonsterScore = Math.floor(gameState.score / monsterInterval) * monsterInterval;
+                
+                // Check if we need to generate a new monster
+                if (currentMonsterScore > gameState.lastMonsterScore) {
+                    gameState.lastMonsterScore = currentMonsterScore;
+                    
+                    // Generate monster(s) anywhere on screen
+                    const monsterX = Math.random() * (600 - 60); // Random X position across screen width
+                    const monsterY = gameState.player.y - (Math.random() * 200 + 100); // Above player
+                    
+                    gameState.monsters.push({
+                        x: monsterX,
+                        y: monsterY,
+                        width: 60,
+                        height: 60
+                    });
+                    
+                    // Generate 2 monsters at once if score is 3000+
+                    if (gameState.score >= 3000) {
+                        const monsterX2 = Math.random() * (600 - 60);
+                        const monsterY2 = gameState.player.y - (Math.random() * 200 + 100);
+                        
+                        gameState.monsters.push({
+                            x: monsterX2,
+                            y: monsterY2,
+                            width: 60,
+                            height: 60
+                        });
+                    }
+                    
+                    console.log(`Monster(s) generated at score ${gameState.highScore}`); // Debug log
+                }
+            }
+            
+            // Remove monsters that are too far below
+            gameState.monsters = gameState.monsters.filter(monster => 
+                monster.y < gameState.player.y + 500
+            );
+        }
+
+        function gameLoop() {
+            if (!gameState.running) return;
+
+            // Handle movement (only if not flipped)
+            if (!gameState.player.flipped) {
+                if (gameState.keys['ArrowLeft'] || gameState.keys['a'] || gameState.keys['A']) {
+                    gameState.player.velocityX = -MOVE_SPEED;
+                } else if (gameState.keys['ArrowRight'] || gameState.keys['d'] || gameState.keys['D']) {
+                    gameState.player.velocityX = MOVE_SPEED;
+                } else {
+                    gameState.player.velocityX *= 0.7; // More friction
+                }
+            }
+
+            // Apply gravity
+            gameState.player.velocityY += GRAVITY;
+
+            // Update position
+            gameState.player.x += gameState.player.velocityX;
+            gameState.player.y += gameState.player.velocityY;
+
+            // Handle screen boundaries (600px width) - only if not flipped
+            if (!gameState.player.flipped) {
+                if (gameState.player.x < 0) {
+                    gameState.player.x = 0;
+                    gameState.player.velocityX = 0;
+                } else if (gameState.player.x > 600 - gameState.player.width) {
+                    gameState.player.x = 600 - gameState.player.width;
+                    gameState.player.velocityX = 0;
+                }
+            }
+
+            // Check platform collisions
+            gameState.platforms.forEach((platform, index) => {
+                if (checkCollision(gameState.player, platform)) {
+                    gameState.player.velocityY = JUMP_FORCE;
+                    // Position player so center is at platform top
+                    gameState.player.y = platform.y - gameState.player.height / 2;
+                    
+                    // If platform is breakable, mark it for immediate removal
+                    if (platform.breakable) {
+                        platform.shouldRemove = true; // Remove immediately when stepped on
+                    }
+                }
+            });
+
+            // Check monster collisions (only if not already flipped)
+            if (!gameState.player.flipped) {
+                gameState.monsters.forEach((monster, index) => {
+                    if (checkMonsterCollision(gameState.player, monster)) {
+                        // Player hits monster - flip and die
+                        gameState.player.flipped = true;
+                        gameState.player.velocityY = 5; // Force downward movement
+                        gameState.player.velocityX = 0; // Stop horizontal movement
+                        
+                        // Game over after a short delay
+                        setTimeout(() => {
+                            gameState.running = false;
+                            document.getElementById('finalScore').textContent = `Final Score: ${gameState.highScore}`;
+                            document.getElementById('gameOver').style.display = 'block';
+                            
+                            // Add to leaderboard if score is good enough
+                            if (gameState.highScore > 0) {
+                                addToLeaderboard(gameState.highScore, gameState.selectedCharacter.id);
+                            }
+                        }, 1000); // 1 second delay before game over
+                    }
+                });
+            }
+
+            // Update camera
+            const playerScreenY = gameState.player.y - gameState.cameraY;
+            if (playerScreenY < window.innerHeight * 0.3) {
+                gameState.cameraY = gameState.player.y - window.innerHeight * 0.3;
+            }
+
+            // Check if player has fallen off the bottom of the screen
+            if (playerScreenY > window.innerHeight + 50) { // Player is 50px below screen
+                // Game over immediately when player falls off screen
+                gameState.running = false;
+                document.getElementById('finalScore').textContent = `Final Score: ${gameState.highScore}`;
+                document.getElementById('gameOver').style.display = 'block';
+                
+                // Add to leaderboard if score is good enough
+                if (gameState.highScore > 0) {
+                    addToLeaderboard(gameState.highScore, gameState.selectedCharacter.id);
+                }
+                return; // Exit the game loop immediately
+            }
+
+            // Update score only if player is above ground level
+            const groundLevel = window.innerHeight - 100; // Define ground level
+            if (gameState.player.y < groundLevel) {
+                const currentScore = Math.max(0, Math.floor((groundLevel - gameState.player.y) / 10));
+                gameState.score = currentScore;
+                // Update high score if current score is higher
+                if (currentScore > gameState.highScore) {
+                    gameState.highScore = currentScore;
+                }
+            }
+            // Update score display with level system
+            let level = 1;
+            if (gameState.score >= 3000) {
+                level = 6;
+            } else if (gameState.score >= 2500) {
+                level = 5;
+            } else if (gameState.score >= 2000) {
+                level = 4;
+            } else if (gameState.score >= 1500) {
+                level = 3;
+            } else if (gameState.score >= 1000) {
+                level = 2;
+            }
+            
+            let scoreText = `Score: ${gameState.score} - Level ${level}`;
+            document.getElementById('score').textContent = scoreText;
+
+            // Remove platforms that are marked for removal
+            gameState.platforms = gameState.platforms.filter(platform => !platform.shouldRemove);
+
+            // Generate new platforms
+            generatePlatforms();
+
+            // Generate new monsters
+            generateMonsters();
+
+            // Render
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function render() {
+            const player = document.getElementById('player');
+            // Simple horizontal positioning with boundary limits
+            player.style.left = gameState.player.x + 'px';
+            player.style.top = (gameState.player.y - gameState.cameraY) + 'px';
+            
+            // Apply flip effect if player is flipped
+            if (gameState.player.flipped) {
+                player.classList.add('flipped');
+            } else {
+                player.classList.remove('flipped');
+            }
+
+            // Clear existing platforms
+            const existingPlatforms = document.querySelectorAll('.platform');
+            existingPlatforms.forEach(platform => platform.remove());
+
+            // Render platforms
+            gameState.platforms.forEach((platform, index) => {
+                const platformElement = document.createElement('div');
+                platformElement.className = platform.breakable ? 'platform breakable' : 'platform';
+                platformElement.style.left = platform.x + 'px';
+                platformElement.style.top = (platform.y - gameState.cameraY) + 'px';
+                platformElement.style.width = platform.width + 'px';
+                platformElement.style.height = platform.height + 'px';
+                document.getElementById('gameContainer').appendChild(platformElement);
+            });
+
+            // Clear existing monsters
+            const existingMonsters = document.querySelectorAll('.monster');
+            existingMonsters.forEach(monster => monster.remove());
+
+            // Render monsters
+            gameState.monsters.forEach((monster, index) => {
+                const monsterElement = document.createElement('div');
+                monsterElement.className = 'monster';
+                monsterElement.style.left = monster.x + 'px';
+                monsterElement.style.top = (monster.y - gameState.cameraY) + 'px';
+                monsterElement.style.width = monster.width + 'px';
+                monsterElement.style.height = monster.height + 'px';
+                document.getElementById('gameContainer').appendChild(monsterElement);
+            });
+        }
+
+        // Keyboard event listeners
+        document.addEventListener('keydown', (e) => {
+            gameState.keys[e.key] = true;
+            if (e.key === 'Escape') {
+                gameState.running = false;
+                document.getElementById('menu').style.display = 'block';
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            gameState.keys[e.key] = false;
+        });
+
+        // Initialize
+        initGame();
+        // Set default character
+        gameState.selectedCharacter = characters[0];
+        const playerElement = document.getElementById('player');
+        
+        if (characters[0].image) {
+            playerElement.style.backgroundImage = `url('${characters[0].image}')`;
+            playerElement.style.backgroundSize = 'contain';
+            playerElement.style.backgroundRepeat = 'no-repeat';
+            playerElement.style.backgroundPosition = 'center';
+            playerElement.style.backgroundColor = 'transparent';
+        } else {
+            playerElement.style.backgroundColor = characters[0].color;
+        }
+    </script>
+</body>
+</html>

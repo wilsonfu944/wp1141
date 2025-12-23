@@ -1,0 +1,68 @@
+.header {
+  background: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  line-height: normal;
+  height: auto;
+  padding: 16px 24px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1890ff;
+  white-space: nowrap;
+}
+
+.logoIcon {
+  font-size: 28px;
+}
+
+.logoText {
+  font-size: 20px;
+}
+
+.searchSection {
+  flex: 1;
+  max-width: 600px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-wrap: wrap;
+  }
+
+  .searchSection {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+}
+
+
+
+

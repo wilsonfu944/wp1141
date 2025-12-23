@@ -1,0 +1,122 @@
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.outOfStock {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.brandTag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.compareCheckbox {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quickView {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.quickView:hover {
+  background: #1890ff;
+  color: white;
+  transform: scale(1.1);
+}
+
+.comparing {
+  border: 2px solid #1890ff;
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.3);
+}
+
+.titleContainer {
+  margin-bottom: 8px;
+}
+
+.categoryRating {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.description {
+  margin: 8px 0 !important;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.features {
+  margin-top: 4px;
+  padding: 6px 0;
+  border-top: 1px dashed #f0f0f0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.price {
+  font-size: 20px;
+  color: #ff4d4f;
+}
+
+.stock {
+  font-size: 12px;
+}
+
+.quantityControl {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
